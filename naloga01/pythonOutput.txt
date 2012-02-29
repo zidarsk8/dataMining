@@ -1,0 +1,40 @@
+
+Koliko primerov in atributov vsebujejo podatki? Kaksnega tipa so atributi?
+stevilo atributov 10000
+stevilo primerov  2000
+----------------------
+
+Kako redka je matrika oz. kaksen delz njenih elementov ima vrednost razlicno od 0?
+stevilo vseh elementov  20000000
+stevilo vseh nicelnih   19917577
+stevilo vseh nenicelnih 82423
+delez vseh nenicelnih   0.004121
+----------------------
+
+Koliko atributov ima vrednost razlicno od 0 za posamezen primer?
+max stevilno nenicelnih atributov na primer 79
+min stevilno nenicelnih atributov na primer 21
+----------------------
+
+V koliko primerih atribut zavzame nenicelne vrednosti?
+max stevilno nenicelnih primerov na atribut 537
+min stevilno nenicelnih primerov na atribut 0
+----------------------
+
+Koliko je vseh razlicnih oznak (razredov) v podatkih?
+S koliko razlicnimi oznakami so oznaceni primeri?
+stevilo oznak (razredov) 82
+max razlicnih oznak      13
+min razlicnih oznak      1
+----------------------
+
+Nastej 3 najbolj pogosta stevila nenicelnih vrednosti atributov pri posameznih primerih.
+[(38, 106), (35, 105), (37, 105)]
+koliko atributov je takih ki imajo najvec oznak, in koliko atributov imajo taki primeri?
+stevilo primerov      1
+max stevilo atributov 39
+min stevilo atributov 39
+koliko atributov imajo primeri z najbolj pogostim stevilom oznak in koliko je takih primerov?
+stevilo primerov      418
+max stevilo atributov 75
+min stevilo atributov 22

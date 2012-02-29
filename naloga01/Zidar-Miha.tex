@@ -1,0 +1,133 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{a4wide}
+\usepackage{fullpage}
+\usepackage[utf8x]{inputenc}
+\usepackage[slovene]{babel}
+\selectlanguage{slovene}
+\usepackage[toc,page]{appendix}
+\usepackage[pdftex]{graphicx} 
+\usepackage{setspace}
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.95}
+\usepackage{listings} 
+\usepackage{hyperref}
+\renewcommand{\baselinestretch}{1.2} 
+\renewcommand{\appendixpagename}{Priloge}
+
+\usepackage{float}
+
+\lstset{ 
+language=Python,
+basicstyle=\footnotesize,
+basicstyle=\ttfamily\footnotesize\setstretch{1},
+backgroundcolor=\color{light-gray},
+}
+
+\title{1. Domača naloga: Nekaj lastnosti podatkov o\\ razvrščanju člankov v tematske skupine}
+\author{Miha Zidar (63060317)}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Uvod}
+
+V prvi doma"ci nalogi smo si pogledali en del podatkov iz tekmovanja \href{http://tunedit.org/challenge/JRS12Contest}{JRS 2012 Data Mining Competition}, ter posku"sali ven razbrati nekaj zna"cilnosti o samih podatkih. Pregledovali smo kako pogosto se kak"sni atributi nahajajo, kako redka je matrika atributov in "se nekaj podobnih zanimivosti.
+
+\section{Rezultati}
+
+\subsection{Koliko primerov in atributov vsebujejo podatki?}
+
+Na"s manj"si nabor podatkov vsebuje 2000 primerov in vsak primer ima 10000 atributov. 
+
+\subsection{Kakšnega tipa so atributi?}
+
+Vsi atributi so predstavljeni kot cela "stevila.
+
+\subsection{Kako redka je matrika oz. kak"sen dele"z njenih elementov ima vrednost razli"cno od 0?}\label{delez1}
+
+V matriki ima 82423 elementov vrednost reazli"cno od ni"c, kar predstavlja 0.4121\% celotne matrike.
+
+\subsection{Koliko atributov ima vrednost razli"cno od 0 za posamezen primer?}
+
+"Stevilo atributov razli"cnih od 0 pri posameznih primerih se giblje med 21 in 79
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.5]{src/nonZeroAttr.pdf}
+\caption{Porazdelitev "stevila neni"celnih vrednosti atributov na posamezen primer}
+\label{slika1}
+\end{center}
+\end{figure}
+
+\subsection{V koliko primerih atribut zavzame neni"celne vrednosti?}
+Ze pri prvem uprasanju smo videlu da je stevilo elementov ki so razli"cni od 0 zelo majhno. To prikazuje tudi spodnji graf.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.5]{src/nonZeroPrimeri.pdf}
+\caption{Porazdelitev "stevila vrednosti posameznih atributov z Y osjo v logaritemski skali}
+\label{slika2}
+\end{center}
+\end{figure}
+
+\subsection{Koliko je vseh razli"cnih oznak (razredov) v podatkih?}
+
+V podatkih je skupaj 82 razli"cnih oznak. Vsebovane so vse oznake od 1 do 83, z izjemo oznake 77.
+
+\subsection{S koliko različnimi oznakami so označeni primeri?}
+
+Posamezni primeri imajo od 1 do 13 oznak, najvec jih je med 1 in 4. 
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.5]{src/labelCountsMax.pdf}
+\caption{Porazdelitev "stevila oznak za posamezen primer}
+\label{slika2}
+\end{center}
+\end{figure}
+
+\subsection{Na"stej 3 najbolj pogosta "stevila nenicelnih vrednosti atributov pri posameznih primerih.}
+
+Najbolj pogosto "stevilo neni"celnih vrednosti ima primer 38 ki ima 106 neni"celnih atributov. Za njem se primera 35 in 37 z 105 neni"celnimi vrednosti atributov.
+
+
+\subsection{Koliko primerov je takih ki imajo najve"c oznak, in koliko atributov imajo taki primeri?}
+
+Tak je samo en primer, in ima 39 nenicelnih atributov. Nekaj takega bi lahko tudi pricakovali, saj pase prav lepo v povprecje stevila neniclenih atributov, in to da ima najvec oznak o"citno ni pogojeno z stevilom atributov razli"cnih od ni"c.
+
+\subsection{Koliko atributov imajo primeri z najbolj pogostim stevilom oznak in koliko je takih primerov?}
+
+Takih primerov je skoraj "cetrtina in sicer natanko 418. Tudi tu se "stevilo nenicelnih atributov lepo ujema z povprecjem. Med temi primeri, "ceprav jih je veliko, ne najdemo nobenega z zelo majhnim ali zelo velikim stevilom neni"celnih atributov. 
+
+
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.5]{src/commonAttr.pdf}
+\caption{"Stevilo neni"celnih atributov za elemente z najbolj pogostim stevilom oznak}
+\label{slika2}
+\end{center}
+\end{figure}
+
+%\subsection{Kakšna je porazdelitev za atribut z največ neničelnimi vrednostmi?}\label{dod2}
+%
+%Atribut z največ neničelnimi vrednostmi je atribut št. 7887, ki ima 537 neničelnih vrednosti. Najbolj pogosta neničelna vrednost tega atributa je 34, ki se pojavi 39-krat.
+%
+%
+%\begin{figure}[H]
+%\begin{center}
+%\includegraphics[scale=0.3]{img/mostDefinedAttr.pdf}
+%\caption{Porazdelitev vrednosti za najbolj določen atribut}
+%\label{slika2}
+%\end{center}
+%\end{figure}
+%
+%\subsection{Katera oznaka se pojavi največkrat?}
+%Najbolj pogosta oznaka je ''40'', ki se pojavi pri 502 primerih.
+
+\section{Izjava o izdelavi doma"ce naloge}
+Doma"co nalogo in pripadaj"ce programe sem izdelal sam.
+
+\end{document}
