@@ -8,50 +8,66 @@ import pickle
 from sets import Set
 
 
-print "\n\ngenerating label counters"
+print "\n\nloading all valid labels"
+mldRaw = pickle.load(open("minidata/trainingDataOD.pickled"))
+validLabels = [i.name for i in mldRaw.domain.class_vars]
+
+atributeNames = [i.name for i in  mldRaw.domain.features]
+
+print "\ngenerating label counters"
 tl = open("minidata/trainingLabels.csv")
 labels = [i.strip().split(",") for i in tl.readlines()]
 labelCounter=collections.Counter(itertools.chain(*labels))
 
+print "\nfiltering unused labels"
 a = collections.defaultdict(list)
-[a[j].append(i) for i,j in labelCounter.most_common()]
+[a[j].append("c"+str(i)) for i,j in labelCounter.most_common() if "c"+str(j) in validLabels]
 
 
-print "\nloading mld"
+print "\nloading mld\n"
 mld=jrs.Data(discretized=True)
 
-data = mld.get_single_class_data("c40")
+#data = mld.get_single_class_data("c40")
 	
+numCounters = len(a.itmes)
+curCounter = 1
+
+for count,labels in a.items():
+
+	prependStr = curCounter+" / "+str(nimCountes)
+	print count,labels
+	mld.get_single_class_data("c40")
+	originalGains = {}
+	
+	for label in labels:
+		data = mld.get_single_class_data(label)
+		
+		print "calculating original gain for: "+label
+		
+		originalGains[label] = {}
+		for attr in attributeNames:
+			originalGains[label][attr] = Orange.feature.scoring.InfoGain(data.domain.features[attr],data)
 
 
-	prvotnGain = Orange.feature.scoring.InfoGain(data.domain.features[0],data)
-	
-	a = [x.get_class().value for x in data]
-	a_original = list(a)
-	random.shuffle(a)
-	
-	for i,ex in enumerate(data):
-		ex.set_class(a[i])
-	
-	randomGain =  Orange.feature.scoring.InfoGain(data.domain.features[0],data)
+#	prvotnGain = Orange.feature.scoring.InfoGain(data.domain.features[0],data)
+#	
+#	a = [x.get_class().value for x in data]
+#	a_original = list(a)
+#	random.shuffle(a)
+#	
+#	for i,ex in enumerate(data):
+#		ex.set_class(a[i])
+#	
+#	randomGain =  Orange.feature.scoring.InfoGain(data.domain.features[0],data)
+#
+#	for i,ex in enumerate(data):
+#		ex.set_class(a_original[i])
 
-	for i,ex in enumerate(data):
-		ex.set_class(a_original[i])
-
-#mldRaw = pickle.load(open("minidata/trainingDataOD.pickled"))
 
 #print mld.domain.features
 #print mld.domain.class_var
 
-#for i in mld.domain.class_vars:
-#	print i
 
 #print mld[0][mld.domain.features[0]]
 
-#for count,labels in a.items():
-#	print count,labels
-#	mld.get_single_class_data("c40")
-#	for label in labels:
-#		print label
-#
-#	#todo .. ALL THE THINGS
+	#todo .. ALL THE THINGS
