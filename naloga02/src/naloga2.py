@@ -54,10 +54,6 @@ else:
 	pickle.dump(originalGains,file("minidata/originalGains.pickled","w"),-1)
 
 
-shuffles = 100;
-print "Calculating shuffled InfoGain ",shuffles," times"
-
-
 randomGains = {}
 if os.path.isfile('minidata/randomGains.pickled'):
 	print "reading random gains from pickle file"
@@ -67,6 +63,9 @@ else:
 		randomGains[group] = {}
 		for attr in attributeNames:
 			randomGains[group][attr] = []
+
+shuffles = 10;
+print "Calculating shuffled InfoGain ",shuffles," times"
 
 numOfGroups = len(labelGroups)
 countGroups = 0
@@ -86,8 +85,22 @@ for group, labels in labelGroups.items():
 		[randomGains[group][attr].append(infoGain(attr,data)) for attr in attributeNames]
 	countGroups += 1
 
+print "saving new randomGains pickle file"
 pickle.dump(randomGains,file("minidata/randomGains.pickled","w"),-1)
 
+print "sorting randomGains"
+[a.sort() for x,i in randomGains.items() for y,a in i.items()]
+
+alpha = 0.05
+
+relevantAttributes = {}
+for group, labels in labelGroups.items():
+	for label in labels:
+		relevantAttributes[label] = []
+		[relevantAttributes[label].append(attr) for attr in attributeNames if (randomGains[group][attr][int((1-alpha)*(len(randomGains[group][attr])-1))] < originalGains[label][attr])]
+				
+for a,b in relevantAttributes.items():
+	print a,b
 
 #	prvotnGain = Orange.feature.scoring.InfoGain(data.domain.features[0],data)
 #	
@@ -106,8 +119,3 @@ pickle.dump(randomGains,file("minidata/randomGains.pickled","w"),-1)
 
 #print mld.domain.features
 #print mld.domain.class_var
-
-
-#print mld[0][mld.domain.features[0]]
-
-	#todo .. ALL THE THINGS
