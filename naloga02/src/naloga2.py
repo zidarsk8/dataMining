@@ -35,9 +35,9 @@ mld=jrs.Data(discretized=True)
 infoGain = Orange.feature.scoring.InfoGain()
 
 originalGains = {}
-if os.path.isfile('minidata/gainTables.pickled'):
+if os.path.isfile('minidata/originalGains.pickled'):
 	print "reading data from pickle file"
-	originalGains = pickle.load(open("minidata/gainTables.pickled"))
+	originalGains = pickle.load(open("minidata/originalGains.pickled"))
 else:
 	print ""	
 	labelCount = len(validLabels)
@@ -47,42 +47,46 @@ else:
 		indexCount = len(attributeNames)
 		for index,attr in enumerate(attributeNames):
 			sys.stdout.flush()
-			sys.stdout.write("Calculating InfoGain for all classes: %d%%   \r" % (1+index*100/indexCount/labelCount + 100*lc/labelCount) )
+			sys.stdout.write("\rCalculating InfoGain for all classes: %3d%%" % (1+index*100/indexCount/labelCount + 100*lc/labelCount) )
 			originalGains[label][attr] = infoGain(attr,data)
 
 	print "\nDumping original InfoGains into a pickle file"
-	pickle.dump(originalGains,file("minidata/gainTables.pickled","w"),-1)
+	pickle.dump(originalGains,file("minidata/originalGains.pickled","w"),-1)
 
 
-shuffles = 10;
+shuffles = 100;
 print "Calculating shuffled InfoGain ",shuffles," times"
 
 
 randomGains = {}
 if os.path.isfile('minidata/randomGains.pickled'):
 	print "reading random gains from pickle file"
-	randomGains = pickle.load(open("minidata/randomGains .pickled"))
+	randomGains = pickle.load(open("minidata/randomGains.pickled"))
 else:
 	for group, labels in labelGroups.items():
 		randomGains[group] = {}
 		for attr in attributeNames:
 			randomGains[group][attr] = []
 
+numOfGroups = len(labelGroups)
+countGroups = 0
 for group, labels in labelGroups.items():
-
-	print "\n\nCalculating random gains for classes ",labels
+	#print "\n\nCalculating random gains for classes ",labels
 	data = mld.get_single_class_data(labels[0])
 	a = ['F']*(numberOfLines - group) + ["T"]*group
 	for i in range(shuffles):
 		sys.stdout.flush()
-		sys.stdout.write("Calculating random InfoGain for all classes: %d%%   \r" % (100*(i+1)/shuffles) )
+		curProc = 100*(i+1)/shuffles
+		fullProc = countGroups*100/numOfGroups + curProc/numOfGroups +1
+		sys.stdout.write("\r%3d%% - Class group: (%2d/%2d) len: %4d : %3d%%" % (fullProc,countGroups+1,numOfGroups,len(randomGains[group][attributeNames[0]]),curProc))
 
 		random.shuffle(a)
 		[ex.set_class(a[i]) for i,ex in enumerate(data)]
 
 		[randomGains[group][attr].append(infoGain(attr,data)) for attr in attributeNames]
-		#[randomGains[group][attr].append(infoGain(attr,data)) for attr in data.domain.features]
+	countGroups += 1
 
+pickle.dump(randomGains,file("minidata/randomGains.pickled","w"),-1)
 
 
 #	prvotnGain = Orange.feature.scoring.InfoGain(data.domain.features[0],data)
