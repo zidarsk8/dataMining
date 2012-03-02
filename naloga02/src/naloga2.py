@@ -1,4 +1,6 @@
 import Orange
+import os.path
+import sys
 import random
 import numpy
 import jrs
@@ -12,7 +14,7 @@ print "\n\nloading all valid labels"
 mldRaw = pickle.load(open("minidata/trainingDataOD.pickled"))
 validLabels = [i.name for i in mldRaw.domain.class_vars]
 
-atributeNames = [i.name for i in  mldRaw.domain.features]
+attributeNames = [i.name for i in  mldRaw.domain.features]
 
 print "\ngenerating label counters"
 tl = open("minidata/trainingLabels.csv")
@@ -28,25 +30,33 @@ print "\nloading mld\n"
 mld=jrs.Data(discretized=True)
 
 #data = mld.get_single_class_data("c40")
-	
-numCounters = len(a.itmes)
-curCounter = 1
 
-for count,labels in a.items():
 
-	prependStr = curCounter+" / "+str(nimCountes)
-	print count,labels
-	mld.get_single_class_data("c40")
-	originalGains = {}
-	
-	for label in labels:
-		data = mld.get_single_class_data(label)
-		
-		print "calculating original gain for: "+label
-		
-		originalGains[label] = {}
-		for attr in attributeNames:
-			originalGains[label][attr] = Orange.feature.scoring.InfoGain(data.domain.features[attr],data)
+
+originalGains = {}
+if os.path.isfile('minidata/gainTables.pickled'):
+
+#	numCounters = len(a.items())
+#	curCounter = 1
+#	for count,labels in a.items():
+#	
+#		prependStr = str(curCounter)+" / "+str(numCounters)
+#		curCounter += 1
+#		#print count,labels
+#		mld.get_single_class_data("c40")
+#		
+#		for label in labels:
+#			data = mld.get_single_class_data(label)
+#			
+#			originalGains[label] = {}
+#			indexCount = len(attributeNames)
+#			for index,attr in enumerate(attributeNames):
+#				sys.stdout.write(prependStr+"    InfoGain: %d%%   \r" % (index*100/indexCount) )
+#				originalGains[label][attr] = Orange.feature.scoring.InfoGain(attr,data)
+#	
+#	pickle.dump("minidata/gainTables.pickled")
+#	
+	print "\n"
 
 
 #	prvotnGain = Orange.feature.scoring.InfoGain(data.domain.features[0],data)
