@@ -35,28 +35,31 @@ mld=jrs.Data(discretized=True)
 
 originalGains = {}
 if os.path.isfile('minidata/gainTables.pickled'):
+	print "reading data from pickle file"
+	originalGains = pickle.load(open("minidata/gainTables.pickled"))
+else:
+	numCounters = len(a.items())
+	curCounter = 1
+	for count,labels in a.items():
+	
+		prependStr = str(curCounter)+" / "+str(numCounters)
+		curCounter += 1
+		#print "\n",count,labels
+		mld.get_single_class_data("c40")
+		
+		labelCount = len(labels)
+		for lc, label in enumerate(labels):
+			data = mld.get_single_class_data(label)
+			originalGains[label] = {}
+			indexCount = len(attributeNames)
+			for index,attr in enumerate(attributeNames):
+				sys.stdout.flush()
+				sys.stdout.write("  "+prependStr+"    InfoGain: %d%%   \r" % (1+index*100/indexCount/labelCount + 100*lc/labelCount) )
+				originalGains[label][attr] = Orange.feature.scoring.InfoGain(attr,data)
+	
+	print "dumping original gains pickle file"
+	pickle.dump(originalGains,file("minidata/gainTables.pickled","w"),-1)
 
-#	numCounters = len(a.items())
-#	curCounter = 1
-#	for count,labels in a.items():
-#	
-#		prependStr = str(curCounter)+" / "+str(numCounters)
-#		curCounter += 1
-#		#print count,labels
-#		mld.get_single_class_data("c40")
-#		
-#		for label in labels:
-#			data = mld.get_single_class_data(label)
-#			
-#			originalGains[label] = {}
-#			indexCount = len(attributeNames)
-#			for index,attr in enumerate(attributeNames):
-#				sys.stdout.write(prependStr+"    InfoGain: %d%%   \r" % (index*100/indexCount) )
-#				originalGains[label][attr] = Orange.feature.scoring.InfoGain(attr,data)
-#	
-#	pickle.dump("minidata/gainTables.pickled")
-#	
-	print "\n"
 
 
 #	prvotnGain = Orange.feature.scoring.InfoGain(data.domain.features[0],data)
