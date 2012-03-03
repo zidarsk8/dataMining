@@ -43,7 +43,7 @@ def getAttributTable():
 		sys.stdout.flush()
 		sys.stdout.write("\rLoading Attribute Table: %3d%%" % (100*i/fl))
 		attr[mld.domain.features[i].name] = listToIntTF([str(a[mld.domain.features[i]])  for a in mld],"> 0.000","<= 0.000")
-	print ""
+	print "\rLoading Attribute Table: 100%%"
 	return attr	
 	#lol one liner, sam ni nic hitrejsi
 	#[attr.append(listToIntTF([str(a[mld.domain.features[feature]])  for a in mld],"> 0.000","<= 0.000")) for i in xrange(len(mld.domain.features))]
@@ -57,35 +57,13 @@ def getClassTable():
 		sys.stdout.flush()
 		sys.stdout.write("\rLoading Class Table: %3d%%" % (100*x/ll))
 		clas[i] = listToInt([mldRaw[x][i].value for x in xrange(len(mldRaw))])
-	print ""
+	print "\rLoading Class Table: 100%%"
 	return clas
 
-alfa = 0.05
-shuffleCount = 500
-
-#for feature in range(1):
-#	orangeGain = Orange.feature.scoring.InfoGain()
-#
-#	ig = orangeGain(data.domain.features[feature], data) 
-#
-#	c = [d.get_class() for d in data]
-#	d = listToIntTF([str(a[data.domain.features[feature]])  for a in data],"> 0.000","<= 0.000")
-#
-#	valList =  [a.value for a in c]
-#	#for i, dd in enumerate(bin(d)[2:]) :
-#	#	print dd, data[i+2000-len(bin(d)[2:])][data.domain.features[0]]
-#	numAttrib = d
-#	numClass = listToInt(valList)
-#	#print len(valList)
-#	print key, numClass
-#	print data.domain.features[feature].name, numAttrib
-#	print "%15.10f " %(gain(numClass,numAttrib,2000)-ig)
-#
-#suma = np.zeros(len(data[0])-1)
-#suma += np.greater(igp, ig)
 
 attribArr = getAttributTable()
 classArr = getClassTable()
 
 print "c40",classArr["c40"]
 print "D_0",attribArr["D_0"]
+
