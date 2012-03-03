@@ -24,7 +24,7 @@ labelCounter=collections.Counter(itertools.chain(*labels))
 
 print "\nfiltering unused labels"
 labelGroups = collections.defaultdict(list)
-[labelGroups[j].append("c"+str(i)) for i,j in labelCounter.most_common() if "c"+str(j) in validLabels]
+[labelGroups[j].append("c"+str(i)) for i,j in labelCounter.most_common() if "c"+str(i) in validLabels]
 
 
 print "\nloading mld\n"
@@ -64,7 +64,7 @@ else:
 		for attr in attributeNames:
 			randomGains[group][attr] = []
 
-shuffles = 10;
+shuffles = 100;
 print "Calculating shuffled InfoGain ",shuffles," times"
 
 numOfGroups = len(labelGroups)
@@ -81,7 +81,6 @@ for group, labels in labelGroups.items():
 
 		random.shuffle(a)
 		[ex.set_class(a[i]) for i,ex in enumerate(data)]
-
 		[randomGains[group][attr].append(infoGain(attr,data)) for attr in attributeNames]
 	countGroups += 1
 
