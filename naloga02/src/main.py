@@ -1,4 +1,5 @@
 from math import log
+import sys
 import pickle
 import Orange
 import numpy
@@ -37,9 +38,12 @@ def getAttributTable():
 	mldd = jrs.Data(discretized=True)
 	mld = mldd.get_single_class_data(label=mldd.classes.keys()[0])
 	attr = {}
-	for i in xrange(len(mld.domain.features)):
-		d = listToIntTF([str(a[mld.domain.features[i]])  for a in mld],"> 0.000","<= 0.000")
-		attr[mld.domain.features[i].name] = d
+	fl = len(mld.domain.features)
+	for i in xrange(fl):
+		sys.stdout.flush()
+		sys.stdout.write("\rLoading Attribute Table: %3d%%" % (100*i/fl))
+		attr[mld.domain.features[i].name] = listToIntTF([str(a[mld.domain.features[i]])  for a in mld],"> 0.000","<= 0.000")
+	print ""
 	return attr	
 	#lol one liner, sam ni nic hitrejsi
 	#[attr.append(listToIntTF([str(a[mld.domain.features[feature]])  for a in mld],"> 0.000","<= 0.000")) for i in xrange(len(mld.domain.features))]
@@ -48,8 +52,12 @@ def getClassTable():
 	clas = {}
 	mldRaw = pickle.load(open("minidata/trainingDataOD.pickled"))
 	validLabels = [i.name for i in mldRaw.domain.class_vars]
+	ll = len(validLabels)
 	for x,i in enumerate(validLabels):
+		sys.stdout.flush()
+		sys.stdout.write("\rLoading Class Table: %3d%%" % (100*x/ll))
 		clas[i] = listToInt([mldRaw[x][i].value for x in xrange(len(mldRaw))])
+	print ""
 	return clas
 
 alfa = 0.05
