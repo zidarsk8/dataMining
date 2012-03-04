@@ -165,28 +165,3 @@ originalGains = getOriginalGains(attribArr,classArr)
 randomGains = getRandomGains(attribArr,classArr,100)
 relevant = getRelevantAttributes(originalGains, randomGains,0.05);
 
-#test.testOriginalGains(originalGains, "c40")
-#rl =["D_"+str(b) for b in  sorted([int(x[2:]) for x in relevant["c40"]])]
-#for i in rl:
-#	print i, originalGains["c40"][i]
-#
-#print len(rl)
-
-
-
-#test.printRandomGainsForAttr(randomGains,originalGains,"c40","D_9")
-#test.printRandomGainsForAttr(randomGains,originalGains,"c40","D_17")
-#test.printRandomGainsForAttr(randomGains,originalGains,"c40","D_59")
-#test.printRandomGainsForAttr(randomGains,originalGains,"c40","D_10")
-
-#test.testRandomGains(randomGains,"c40","D_251")
-
-for r in sorted(relevant.iterkeys()):
-	print r, len(relevant[r])
-#
-#ral = [len(relevant[r]) for r in relevant]
-#pyplot.hist(ral,bins=83)
-#pyplot.xlabel("st. nenicelnih atributov")
-#pyplot.ylabel("st. primerov")
-#pyplot.savefig("ral.pdf")
-#pyplot.close()
