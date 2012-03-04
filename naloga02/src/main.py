@@ -82,7 +82,6 @@ def getOriginalGains():
 	print "\rCalculating original Gain values: 100%"
 	return originalGains
 
-
 def getRandomGains(permutations):
 	rg = {}
 	cal = float(len(classArr))
@@ -104,21 +103,27 @@ def getRandomGains(permutations):
 					sys.stdout.write("\rCalculating random Gain values: %3.1f%%" % percent)
 				rg[clas][attr].append(gain(rc,attribArr[attr],2000))
 	print "\rCalculating random Gain values: 100.0%"
+	[x.sort() for iii, a in rg.items() for ii, x in a.items()]
 	return rg
 
+def getRelevantAttrbutes(rnd, aarr, carr,alpha):
+	relevant = {}
+	for c in carr:
+		relevant[c] = []
+		for a in aarr:
+			if rnd[c][a][int( (len(rnd[c][a])-1)*alpha )]
 
 
-
-
+	return relevant
 
 attribArr = getAttributTable()
 classArr = getClassTable()
 originalGains = getOriginalGains()
-randomGains = getRandomGains(500)
+randomGains = getRandomGains(50)
+relevant = getRelevantAttributes(randomGains,originalGains, 0.05);
 
 
-print "saving new randomGains pickle file"
-pickle.dump(randomGains,file("minidata/randomGainsV2.pickled","w"),-1)
+
 
 
 
