@@ -77,7 +77,7 @@ def getClassTable():
 		pickle.dump(clas,file("minidata/classTable.pickled","w"),-1)
 	return clas
 
-def getOriginalGains():
+def getOriginalGains(attribArr,classArr):
 	orig = {}
 	if isfile('minidata/originalGains.pickled'):
 		print "Loading Original Gains from pickle file"
@@ -96,7 +96,7 @@ def getOriginalGains():
 		pickle.dump(orig,file("minidata/originalGains.pickled","w"),-1)
 	return orig
 
-def getRandomGains(permutations):
+def getRandomGains(attribArr,classArr,permutations):
 	rg = {}
 	cal = float(len(classArr))
 	aal = len(attribArr)
@@ -129,9 +129,6 @@ def getRelevantAttributes(orig, rand, alpha):
 		for attr in orig[clas]:
 			if rand[clas][attr][int((len(rand[clas][attr])-1)*(1-alpha))] < orig[clas][attr]:
 				relevant[clas].append(attr)
-				#print clas,attr,orig[clas][attr]
-				#print rand[clas][attr]
-				#print rand[clas][attr][int((len(rand[clas][attr])-1)*(1-alpha))]
 	return relevant
 
 def testOriginalGains(og,label,p=False):
@@ -149,17 +146,10 @@ def testOriginalGains(og,label,p=False):
 
 attribArr = getAttributTable()
 classArr = getClassTable()
-originalGains = getOriginalGains()
+originalGains = getOriginalGains(attribArr,classArr)
+randomGains = getRandomGains(attribArr,classArr,200)
+relevant = getRelevantAttributes(originalGains, randomGains,0.05);
+
 testOriginalGains(originalGains, "c40")
-#randomGains = getRandomGains(200)
-#relevant = getRelevantAttributes(originalGains, randomGains,0.05);
-#
-#
-#for i in relevant:
-#	if i == "c40":
-#		print "\n",relevant[i]
-#	print i,len(relevant[i])
-
-
 
 
