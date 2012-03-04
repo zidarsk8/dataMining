@@ -9,6 +9,7 @@ import Orange
 import numpy
 import jrs
 import test
+import graf
 
 # turns list of true and false strings into an int TTFT = 1101 = 13 
 def listToIntTF(l,t,f):
@@ -164,4 +165,6 @@ classArr = getClassTable()
 originalGains = getOriginalGains(attribArr,classArr)
 randomGains = getRandomGains(attribArr,classArr,100)
 relevant = getRelevantAttributes(originalGains, randomGains,0.05);
+
+graf.classAttr(relevant)
 
