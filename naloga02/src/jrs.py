@@ -95,7 +95,6 @@ class RawData:
 class Data:
     def __init__(self, discretized=False):
         self.ml_data = cPickle.load(file(orange_disc_filename if discretized else orange_data_filename))
-        print "Loaded:", len(self.ml_data)
         self.classes = {v.name:v for v in self.ml_data.domain.class_vars}
 
     def get_single_class_data(self, label="c40"):

@@ -1,7 +1,8 @@
+from os.path import isfile
 from random import random
 from random import shuffle
-from os.path import isfile
 from math import log
+from matplotlib import pyplot
 import sys
 import pickle
 import Orange
@@ -107,7 +108,8 @@ def getRandomGains(attribArr,classArr,permutations):
 			rg[c][a] = []
 	for ci, clas in enumerate(classArr):
 		rArr = list(bin(classArr[clas]["n"])[2:])
-		for i in xrange(permutations):
+		#for i in xrange(permutations): for testing 
+		for i in xrange(permutations if clas == "c40" else 10):
 			shuffle(rArr)
 			rc = {"n":int("".join(rArr),2), "l":classArr[clas]["l"], "c":classArr[clas]["c"]}
 			for ai, attr in enumerate(attribArr):
@@ -143,13 +145,60 @@ def testOriginalGains(og,label,p=False):
 		s += abs(og[label][i]-ga)
 	print "Povprecna napaka za razred \"%s\":  %.9f" % (label,s/l)
 
+def testRandomGains(rg,clas,attr):
+	mld=jrs.Data(discretized=True)
+	data = mld.get_single_class_data(clas)
+	l = len(rg[clas][attr])
+	avgRg = sum(rg[clas][attr])/l
+	avgOr = 0
+	oRan = []
+	for i in range(l):
+		a = [x.get_class().value for x in data]
+		shuffle(a)
+		[ex.set_class(a[i]) for i,ex in enumerate(data)]
+		
+		o = Orange.feature.scoring.InfoGain(attr,data)
+		oRan.append(o)
+		avgOr += o
+	pl(oRan,50,"test"+clas+attr+"Orange.pdf")
+	pl(rg[clas][attr],50,"test"+clas+attr+"Random.pdf")
+	print "%.9f     %.9f" % (avgRg,(avgOr/l))
+
+
+def printRandomGainsForAttr(randomGains,originalGains,clas,attr):
+	randomGains[clas][attr].sort
+	for i in randomGains[clas][attr]:
+		if originalGains[clas][attr] < i:
+			print " - %.9f" % i
+		else:
+			print "   %.9f" % i
+	print "original : ", originalGains[clas][attr]
+
+def pl(a,b,c):
+	pyplot.hist(a,bins=b)
+	pyplot.savefig(c)
+	pyplot.close()
+
 
 attribArr = getAttributTable()
 classArr = getClassTable()
 originalGains = getOriginalGains(attribArr,classArr)
-randomGains = getRandomGains(attribArr,classArr,200)
+randomGains = getRandomGains(attribArr,classArr,2000)
 relevant = getRelevantAttributes(originalGains, randomGains,0.05);
 
-testOriginalGains(originalGains, "c40")
+testRandomGains(randomGains,"c40","D_251")
+testRandomGains(randomGains,"c40","D_1404")
+testRandomGains(randomGains,"c40","D_14")
+testRandomGains(randomGains,"c40","D_141")
+testRandomGains(randomGains,"c40","D_1")
 
-
+#testOriginalGains(originalGains, "c40")
+#for r in sorted(relevant.iterkeys()):
+#	print r, len(relevant[r])
+#
+#ral = [len(relevant[r]) for r in relevant]
+#pyplot.hist(ral,bins=83)
+#pyplot.xlabel("st. nenicelnih atributov")
+#pyplot.ylabel("st. primerov")
+#pyplot.savefig("ral.pdf")
+#pyplot.close()
