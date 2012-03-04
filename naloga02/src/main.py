@@ -1,3 +1,5 @@
+from random import random
+from random import shuffle
 from math import log
 import sys
 import pickle
@@ -12,7 +14,13 @@ def listToInt(l):
 	return int("".join(l).replace("T","1").replace("F","0"),2)
 
 def countOnes(n):
-	return len([a for a in list(bin(n)) if a=="1"])
+	return bin(n).count("1")
+	#return len([a for a in list(bin(n)) if a=="1"])
+
+def entropy(n,size):
+	p1 = countOnes(n)/float(size)
+	p0 = 1-p1
+	return -(p1 * log(p1,2) + p0 * log (p0,2))
 
 def gain(x,y,size):
 	x1 = countOnes(x)
@@ -43,7 +51,7 @@ def getAttributTable():
 		sys.stdout.flush()
 		sys.stdout.write("\rLoading Attribute Table: %3d%%" % (100*i/fl))
 		attr[mld.domain.features[i].name] = listToIntTF([str(a[mld.domain.features[i]])  for a in mld],"> 0.000","<= 0.000")
-	print "\rLoading Attribute Table: 100%%"
+	print "\rLoading Attribute Table: 100%"
 	return attr	
 	#lol one liner, sam ni nic hitrejsi
 	#[attr.append(listToIntTF([str(a[mld.domain.features[feature]])  for a in mld],"> 0.000","<= 0.000")) for i in xrange(len(mld.domain.features))]
@@ -57,13 +65,60 @@ def getClassTable():
 		sys.stdout.flush()
 		sys.stdout.write("\rLoading Class Table: %3d%%" % (100*x/ll))
 		clas[i] = listToInt([mldRaw[x][i].value for x in xrange(len(mldRaw))])
-	print "\rLoading Class Table: 100%%"
+	print "\rLoading Class Table: 100%"
 	return clas
+
+def getOriginalGains():
+	originalGains = {}
+	cal = len(classArr)
+	aal = len(attribArr)
+	for ci, clas in enumerate(classArr):
+		originalGains[clas] = {} 
+		for ai, attr in enumerate(attribArr):
+			if ai % 100 == 0:
+				sys.stdout.flush()
+				sys.stdout.write("\rCalculating original Gain values: %3d%%" % (100*(ci*aal+ai)/(aal*cal)))
+			originalGains[clas][attr] = (gain(classArr[clas],attribArr[attr],2000))
+	print "\rCalculating original Gain values: 100%"
+	return originalGains
+
+
+def getRandomGains(permutations):
+	rg = {}
+	cal = float(len(classArr))
+	aal = len(attribArr)
+	# najlazi je na zacetku hitr inicializirat randomGains tabelo
+	for c in classArr:
+		rg[c] = {} 
+		for a in attribArr:
+			rg[c][a] = []
+	for ci, clas in enumerate(classArr):
+		rArr = list(bin(classArr[clas])[2:])
+		for i in xrange(permutations):
+			shuffle(rArr)
+			rc = int("".join(rArr),2)
+			for ai, attr in enumerate(attribArr):
+				if (ai%100 == 0):
+					percent = (100*(aal*(ci*permutations+i)+ai)/(aal*cal*permutations))
+					sys.stdout.flush()
+					sys.stdout.write("\rCalculating random Gain values: %3.1f%%" % percent)
+				rg[clas][attr].append(gain(rc,attribArr[attr],2000))
+	print "\rCalculating random Gain values: 100.0%"
+	return rg
+
+
+
+
 
 
 attribArr = getAttributTable()
 classArr = getClassTable()
+originalGains = getOriginalGains()
+randomGains = getRandomGains(500)
 
-print "c40",classArr["c40"]
-print "D_0",attribArr["D_0"]
+
+print "saving new randomGains pickle file"
+pickle.dump(randomGains,file("minidata/randomGainsV2.pickled","w"),-1)
+
+
 
