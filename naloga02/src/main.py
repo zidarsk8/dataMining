@@ -8,22 +8,31 @@ import pickle
 import Orange
 import numpy
 import jrs
+import test
 
+# turns list of true and false strings into an int TTFT = 1101 = 13 
 def listToIntTF(l,t,f):
 	i = int("".join(l).replace(t,"1").replace(f,"0"),2)
 	return {"n":i, "l":len(l), "c":countOnes(i)}
 
+# turns a list of T and F to an integer representation
 def listToInt(l):
 	return listToIntTF(l,"T","F")
 
+# returns the number of bits set to 1 in a number
 def countOnes(n):
 	return bin(n).count("1")
 
+# calculates the entropy of a number, where the values of
+# each bit represents one value
 def entropy(n,size):
 	p1 = countOnes(n)/float(size)
 	p0 = 1-p1
 	return -(p1 * log(p1,2) + p0 * log (p0,2))
 
+# calculates information gain between two bitmaps (integers)
+# x,y must be {n: number, c: numberOfOnes, s: sizeRepresented}
+# I should get rid of the size since it's in x and y but too lazy
 def gain(x,y,size):
 	x1 = x["c"]
 	y1 = y["c"]
@@ -44,6 +53,10 @@ def gain(x,y,size):
 		(0 if x1y0==0 else px1y0 * log((px1y0)/(px1*py0),2)) + \
 		(0 if x0y0==0 else px0y0 * log((px0y0)/(px0*py0),2)) 
 		
+# turns a 2D array into a list of numbers, where each number presents
+# the binary values in a column 
+# the information is then pickled and if a pickle file exists it gets
+# used insted of calculating again
 def getAttributTable():
 	attr = {}
 	if isfile('minidata/attributeTable.pickled'):
@@ -61,6 +74,10 @@ def getAttributTable():
 		pickle.dump(attr,file("minidata/attributeTable.pickled","w"),-1)
 	return attr	
 
+# turns a 2D array into a list of numbers, where each number presents
+# the binary values in a column 
+# the information is then pickled and if a pickle file exists it gets
+# used insted of calculating again
 def getClassTable():
 	clas = {}
 	if isfile('minidata/classTable.pickled'):
@@ -78,6 +95,10 @@ def getClassTable():
 		pickle.dump(clas,file("minidata/classTable.pickled","w"),-1)
 	return clas
 
+# calculates and returns Info gain values for each pair of values from
+# attributeArray and classArray
+# the information is then pickled and if a pickle file exists it gets
+# used insted of calculating again
 def getOriginalGains(attribArr,classArr):
 	orig = {}
 	if isfile('minidata/originalGains.pickled'):
@@ -97,6 +118,9 @@ def getOriginalGains(attribArr,classArr):
 		pickle.dump(orig,file("minidata/originalGains.pickled","w"),-1)
 	return orig
 
+# calculates info gain between the attrributeArray and random permutations of 
+# classArray. 
+# function returns a sorted list of all random gains for each pair of numbers
 def getRandomGains(attribArr,classArr,permutations):
 	rg = {}
 	cal = float(len(classArr))
@@ -108,8 +132,8 @@ def getRandomGains(attribArr,classArr,permutations):
 			rg[c][a] = []
 	for ci, clas in enumerate(classArr):
 		rArr = list(bin(classArr[clas]["n"])[2:])
-		#for i in xrange(permutations): for testing 
-		for i in xrange(permutations if clas == "c40" else 10):
+		for i in xrange(permutations): #for testing 
+		#for i in xrange(permutations if clas == "c40" else 10):
 			shuffle(rArr)
 			rc = {"n":int("".join(rArr),2), "l":classArr[clas]["l"], "c":classArr[clas]["c"]}
 			for ai, attr in enumerate(attribArr):
@@ -123,78 +147,42 @@ def getRandomGains(attribArr,classArr,permutations):
 	[x.sort() for iii, a in rg.items() for ii, x in a.items()]
 	return rg
 
+# filers all relevant artributes from according to the randomGainsArray 
+# with the confidence of alpha
 def getRelevantAttributes(orig, rand, alpha):
 	relevant = {}
 	print "Obtaining relevant attributes at Alpha = %.2f" % alpha
 	for clas in orig:
 		relevant[clas] = []
 		for attr in orig[clas]:
-			if rand[clas][attr][int((len(rand[clas][attr])-1)*(1-alpha))] < orig[clas][attr]:
+			if rand[clas][attr][int((len(rand[clas][attr])-1)*(1-alpha))] <= orig[clas][attr]:
 				relevant[clas].append(attr)
 	return relevant
-
-def testOriginalGains(og,label,p=False):
-	mld=jrs.Data(discretized=True)
-	data = mld.get_single_class_data(label)
-	l = len(og[label])
-	s = 0
-	for i in sorted(og[label].iterkeys()):
-		ga = Orange.feature.scoring.InfoGain(i,data)
-		if p:
-			print "%10s        %.9f        %.9f        %.9f" % (i,og[label][i]-ga,og[label][i],ga)
-		s += abs(og[label][i]-ga)
-	print "Povprecna napaka za razred \"%s\":  %.9f" % (label,s/l)
-
-def testRandomGains(rg,clas,attr):
-	mld=jrs.Data(discretized=True)
-	data = mld.get_single_class_data(clas)
-	l = len(rg[clas][attr])
-	avgRg = sum(rg[clas][attr])/l
-	avgOr = 0
-	oRan = []
-	for i in range(l):
-		a = [x.get_class().value for x in data]
-		shuffle(a)
-		[ex.set_class(a[i]) for i,ex in enumerate(data)]
-		
-		o = Orange.feature.scoring.InfoGain(attr,data)
-		oRan.append(o)
-		avgOr += o
-	pl(oRan,50,"test"+clas+attr+"Orange.pdf")
-	pl(rg[clas][attr],50,"test"+clas+attr+"Random.pdf")
-	print "%.9f     %.9f" % (avgRg,(avgOr/l))
-
-
-def printRandomGainsForAttr(randomGains,originalGains,clas,attr):
-	randomGains[clas][attr].sort
-	for i in randomGains[clas][attr]:
-		if originalGains[clas][attr] < i:
-			print " - %.9f" % i
-		else:
-			print "   %.9f" % i
-	print "original : ", originalGains[clas][attr]
-
-def pl(a,b,c):
-	pyplot.hist(a,bins=b)
-	pyplot.savefig(c)
-	pyplot.close()
-
 
 attribArr = getAttributTable()
 classArr = getClassTable()
 originalGains = getOriginalGains(attribArr,classArr)
-randomGains = getRandomGains(attribArr,classArr,2000)
+randomGains = getRandomGains(attribArr,classArr,100)
 relevant = getRelevantAttributes(originalGains, randomGains,0.05);
 
-testRandomGains(randomGains,"c40","D_251")
-testRandomGains(randomGains,"c40","D_1404")
-testRandomGains(randomGains,"c40","D_14")
-testRandomGains(randomGains,"c40","D_141")
-testRandomGains(randomGains,"c40","D_1")
+#test.testOriginalGains(originalGains, "c40")
+#rl =["D_"+str(b) for b in  sorted([int(x[2:]) for x in relevant["c40"]])]
+#for i in rl:
+#	print i, originalGains["c40"][i]
+#
+#print len(rl)
 
-#testOriginalGains(originalGains, "c40")
-#for r in sorted(relevant.iterkeys()):
-#	print r, len(relevant[r])
+
+
+#test.printRandomGainsForAttr(randomGains,originalGains,"c40","D_9")
+#test.printRandomGainsForAttr(randomGains,originalGains,"c40","D_17")
+#test.printRandomGainsForAttr(randomGains,originalGains,"c40","D_59")
+#test.printRandomGainsForAttr(randomGains,originalGains,"c40","D_10")
+
+#test.testRandomGains(randomGains,"c40","D_251")
+
+for r in sorted(relevant.iterkeys()):
+	print r, len(relevant[r])
 #
 #ral = [len(relevant[r]) for r in relevant]
 #pyplot.hist(ral,bins=83)

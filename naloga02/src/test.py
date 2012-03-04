@@ -1,61 +1,72 @@
+from os.path import isfile
 from random import random
 from random import shuffle
 from math import log
+from matplotlib import pyplot
+import sys
+import pickle
+import Orange
+import numpy
+import jrs
+
+def testOriginalGains(og,label,p=False):
+	mld=jrs.Data(discretized=True)
+	data = mld.get_single_class_data(label)
+	l = len(og[label])
+	s = 0
+	for i in sorted(og[label].iterkeys()):
+		ga = Orange.feature.scoring.InfoGain(i,data)
+		if p:
+			print "%10s        %.9f        %.9f        %.9f" % (i,og[label][i]-ga,og[label][i],ga)
+		s += abs(og[label][i]-ga)
+	print "Povprecna napaka za razred \"%s\":  %.9f" % (label,s/l)
+
+def getOrangeRandomGains(rg,clas):
+	mld = jrs.Data(discretized=True)
+	data = mld.get_single_class_data(clas)
+	orange = {}
+	for attr in rg[clas]:
+		a = [x.get_class().value for x in data]
+		l = len(rg[clas][attr])
+		orange[attr] = []
+		for i in range(l):
+			shuffle(a)
+			[ex.set_class(a[i]) for i,ex in enumerate(data)]
+			orange[attr].append(Orange.feature.scoring.InfoGain(attr,data))
+	return orange
+
+def testRandomGains(rg,clas,attr):
+	mld=jrs.Data(discretized=True)
+	data = mld.get_single_class_data(clas)
+	l = len(rg[clas][attr])
+	avgRg = sum(rg[clas][attr])/l
+	avgOr = 0
+	oRan = []
+	for i in range(l):
+		a = [x.get_class().value for x in data]
+		shuffle(a)
+		[ex.set_class(a[i]) for i,ex in enumerate(data)]
+		
+		o = Orange.feature.scoring.InfoGain(attr,data)
+		oRan.append(o)
+		avgOr += o
+	pl(oRan,50,"test"+clas+attr+"Orange.pdf")
+	pl(rg[clas][attr],50,"test"+clas+attr+"Random.pdf")
+	print "%.9f     %.9f" % (avgRg,(avgOr/l))
 
 
-def listToInt(l,t,f):
-	return int("".join(l).replace(t,"1").replace(f,"0"),2)
+def printRandomGainsForAttr(randomGains,originalGains,clas,attr):
+	randomGains[clas][attr].sort
+	for e,i in enumerate(randomGains[clas][attr]):
+		if originalGains[clas][attr] <= i:
+			print "%4d  - %.9f" % (e,i)
+		else:
+			print "%4d    %.9f" % (e,i)
+	print "original : ", originalGains[clas][attr]
 
-def listToInt(l):
-	return int("".join(l).replace("T","1").replace("F","0"),2)
-
-def countOnes(n):
-	return len([a for a in list(bin(n)) if a=="1"])
-
-def countOnesSlow(n):
-	i = 1
-	count = 0
-	while i<=n:
-		count += n&i != 0
-		i *= 2
-	return count
-
-def entropy(n,size):
-	p1 = countOnes(n)/float(size)
-	p0 = 1-p1
-	return -(p1 * log(p1,2) + p0 * log (p0,2))
-
-def gain(x,y,size):
-	x1 = countOnes(x)
-	y1 = countOnes(y)
-	x1y1 = countOnes(x&y)
-	x1y0 = x1 - x1y1
-	x0y1 = y1 - x1y1
-	x0y0 = size - x1y1 - x1y0 - x0y1
-	px1 = x1 / float(size)
-	py1 = y1 / float(size)
-	px0 = 1 - px1
-	py0 = 1 - py1
-	px1y1 = x1y1 / float(size)
-	px1y0 = x1y0 / float(size)
-	px0y1 = x0y1 / float(size)
-	px0y0 = x0y0 / float(size)
-	return  px1y1 * log((px1y1)/(px1*py1) + (x1y1==0),2) + \
-			px0y1 * log((px0y1)/(px0*py1) + (x0y1==0),2) + \
-			px1y0 * log((px1y0)/(px1*py0) + (x1y0==0),2) + \
-			px0y0 * log((px0y0)/(px0*py0) + (x0y0==0),2)
+def pl(a,b,c):
+	pyplot.hist(a,bins=b)
+	pyplot.savefig(c)
+	pyplot.close()
 
 
-
-
-aa = ["T"]*512+["F"]*(2000-512)
-bb = ["T"]*512+["F"]*(2000-512)
-
-shuffle(aa)
-shuffle(bb)
-a = listToInt(aa)
-b = listToInt(bb)
-
-print gain(8,10,4)
-print gain(12,10,4)
-print gain(10,10,4)
