@@ -1,28 +1,39 @@
+from os.path import isfile
 from random import random
 from random import shuffle
-from os.path import isfile
 from math import log
+from matplotlib import pyplot
 import sys
 import pickle
 import Orange
 import numpy
 import jrs
+import test
+import graf
 
+# turns list of true and false strings into an int TTFT = 1101 = 13 
 def listToIntTF(l,t,f):
 	i = int("".join(l).replace(t,"1").replace(f,"0"),2)
 	return {"n":i, "l":len(l), "c":countOnes(i)}
 
+# turns a list of T and F to an integer representation
 def listToInt(l):
 	return listToIntTF(l,"T","F")
 
+# returns the number of bits set to 1 in a number
 def countOnes(n):
 	return bin(n).count("1")
 
+# calculates the entropy of a number, where the values of
+# each bit represents one value
 def entropy(n,size):
 	p1 = countOnes(n)/float(size)
 	p0 = 1-p1
 	return -(p1 * log(p1,2) + p0 * log (p0,2))
 
+# calculates information gain between two bitmaps (integers)
+# x,y must be {n: number, c: numberOfOnes, s: sizeRepresented}
+# I should get rid of the size since it's in x and y but too lazy
 def gain(x,y,size):
 	x1 = x["c"]
 	y1 = y["c"]
@@ -43,6 +54,10 @@ def gain(x,y,size):
 		(0 if x1y0==0 else px1y0 * log((px1y0)/(px1*py0),2)) + \
 		(0 if x0y0==0 else px0y0 * log((px0y0)/(px0*py0),2)) 
 		
+# turns a 2D array into a list of numbers, where each number presents
+# the binary values in a column 
+# the information is then pickled and if a pickle file exists it gets
+# used insted of calculating again
 def getAttributTable():
 	attr = {}
 	if isfile('minidata/attributeTable.pickled'):
@@ -60,6 +75,10 @@ def getAttributTable():
 		pickle.dump(attr,file("minidata/attributeTable.pickled","w"),-1)
 	return attr	
 
+# turns a 2D array into a list of numbers, where each number presents
+# the binary values in a column 
+# the information is then pickled and if a pickle file exists it gets
+# used insted of calculating again
 def getClassTable():
 	clas = {}
 	if isfile('minidata/classTable.pickled'):
@@ -77,7 +96,11 @@ def getClassTable():
 		pickle.dump(clas,file("minidata/classTable.pickled","w"),-1)
 	return clas
 
-def getOriginalGains():
+# calculates and returns Info gain values for each pair of values from
+# attributeArray and classArray
+# the information is then pickled and if a pickle file exists it gets
+# used insted of calculating again
+def getOriginalGains(attribArr,classArr):
 	orig = {}
 	if isfile('minidata/originalGains.pickled'):
 		print "Loading Original Gains from pickle file"
@@ -96,7 +119,10 @@ def getOriginalGains():
 		pickle.dump(orig,file("minidata/originalGains.pickled","w"),-1)
 	return orig
 
-def getRandomGains(permutations):
+# calculates info gain between the attrributeArray and random permutations of 
+# classArray. 
+# function returns a sorted list of all random gains for each pair of numbers
+def getRandomGains(attribArr,classArr,permutations):
 	rg = {}
 	cal = float(len(classArr))
 	aal = len(attribArr)
@@ -107,7 +133,8 @@ def getRandomGains(permutations):
 			rg[c][a] = []
 	for ci, clas in enumerate(classArr):
 		rArr = list(bin(classArr[clas]["n"])[2:])
-		for i in xrange(permutations):
+		for i in xrange(permutations): #for testing 
+		#for i in xrange(permutations if clas == "c40" else 10):
 			shuffle(rArr)
 			rc = {"n":int("".join(rArr),2), "l":classArr[clas]["l"], "c":classArr[clas]["c"]}
 			for ai, attr in enumerate(attribArr):
@@ -121,45 +148,27 @@ def getRandomGains(permutations):
 	[x.sort() for iii, a in rg.items() for ii, x in a.items()]
 	return rg
 
+# filers all relevant artributes from according to the randomGainsArray 
+# with the confidence of alpha
 def getRelevantAttributes(orig, rand, alpha):
 	relevant = {}
 	print "Obtaining relevant attributes at Alpha = %.2f" % alpha
 	for clas in orig:
 		relevant[clas] = []
 		for attr in orig[clas]:
-			if rand[clas][attr][int((len(rand[clas][attr])-1)*(1-alpha))] < orig[clas][attr]:
+			if rand[clas][attr][int((len(rand[clas][attr])-1)*(1-alpha))] <= orig[clas][attr]:
 				relevant[clas].append(attr)
-				#print clas,attr,orig[clas][attr]
-				#print rand[clas][attr]
-				#print rand[clas][attr][int((len(rand[clas][attr])-1)*(1-alpha))]
 	return relevant
-
-def testOriginalGains(og,label,p=False):
-	mld=jrs.Data(discretized=True)
-	data = mld.get_single_class_data(label)
-	l = len(og[label])
-	s = 0
-	for i in sorted(og[label].iterkeys()):
-		ga = Orange.feature.scoring.InfoGain(i,data)
-		if p:
-			print "%10s        %.9f        %.9f        %.9f" % (i,og[label][i]-ga,og[label][i],ga)
-		s += abs(og[label][i]-ga)
-	print "Povprecna napaka za razred \"%s\":  %.9f" % (label,s/l)
-
 
 attribArr = getAttributTable()
 classArr = getClassTable()
-originalGains = getOriginalGains()
-testOriginalGains(originalGains, "c40")
-#randomGains = getRandomGains(200)
-#relevant = getRelevantAttributes(originalGains, randomGains,0.05);
-#
-#
-#for i in relevant:
-#	if i == "c40":
-#		print "\n",relevant[i]
-#	print i,len(relevant[i])
+originalGains = getOriginalGains(attribArr,classArr)
+randomGains = getRandomGains(attribArr,classArr,100)
+relevant00 = getRelevantAttributes(originalGains, randomGains,0.00);
+relevant01 = getRelevantAttributes(originalGains, randomGains,0.01);
+relevant05 = getRelevantAttributes(originalGains, randomGains,0.05);
+relevant10 = getRelevantAttributes(originalGains, randomGains,0.10);
 
-
-
+graf.singleClassAttr(relevant05)
+graf.multiClassAttr([relevant10,relevant05,relevant01,relevant00],("alpha = 0.10","alpha = 0.05","alpha = 0.01", "alpha = 0.00"),append="raw")
 

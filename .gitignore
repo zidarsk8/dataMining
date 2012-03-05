@@ -22,10 +22,9 @@
 *.nav
 *.snm
 *.vrb
+*.swp
 
 *.pyc
 *.pickled
 
 *.zip
-*.pdf
-!*Potoènik-Matic.pdf
