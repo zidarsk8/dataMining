@@ -1,0 +1,142 @@
+% To je predloga za poročila o domačih nalogah pri predmetih, katerih
+% nosilec je Blaž Zupan. Seveda lahko tudi dodaš kakšen nov, zanimiv
+% in uporaben element, ki ga v tej predlogi (še) ni. Več o LaTeX-u izveš na
+% spletu, na primer na http://tobi.oetiker.ch/lshort/lshort.pdf.
+%
+% To predlogo lahko spremeniš v PDF dokument s pomočjo programa
+% pdflatex, ki je del standardne instalacije LaTeX programov.
+
+\documentclass[a4paper,11pt]{article}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{a4wide}
+\usepackage{fullpage}
+\usepackage[utf8x]{inputenc}
+\usepackage[slovene]{babel}
+\selectlanguage{slovene}
+\usepackage[toc,page]{appendix}
+\usepackage[pdftex]{graphicx} % za slike
+\usepackage{setspace}
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.95}
+\usepackage{hyperref}
+\renewcommand{\baselinestretch}{1.2} % za boljšo berljivost večji razmak
+\renewcommand{\appendixpagename}{Priloge}
+
+\usepackage{listings} % za vključevanje kode
+% nastavitve za izpis kode
+\lstset{ 
+	language=Python,
+	basicstyle=\footnotesize,
+	basicstyle=\ttfamily\footnotesize\setstretch{1},
+	backgroundcolor=\color{light-gray},
+}
+
+\title{2. domača naloga: Informativnost značilk\\pri napovedovanju posameznih tem}
+\author{Matic Potočnik (63060270)}
+\date{\today}
+
+\newcommand\q[1]{``#1''}
+
+% dodatni paketi
+\usepackage{float}
+\graphicspath{{src/}} 
+\DeclareGraphicsExtensions{.pdf,.png,.jpg,.jpeg}
+
+\begin{document}
+\maketitle
+
+\section{Uvod}
+
+V nalogi smo predprocesirali in binarizirali podnabor podatkov iz tekmovanja \href{http://tunedit.org/challenge/JRS12Contest}{JRS 2012 Data Mining Competition}, ter ocenili kateri atributi nosijo največ informacije za posamezen razred, s pomočjo mere medsebojne informacije, ter permutacijskega testa.
+
+\section{Metode}
+\subsection{Medsebojna informacija}
+Za ocenjevanje kakovosti atributov smo uporabili mero medsebojne informacije med atributom in razredom oz. infomacijski prispevek\cite{kononenko}.
+\ \\ \ \\
+\textbf{Matematična definicija}\ \\
+Enačba za izračun informacijskega prispevka je:
+$$\mbox{Gain}(A)\ =\ \mbox{H}_C - \mbox{H}_{C|A}$$
+Pri tem je entropija H definirana kot:
+$$\begin{aligned}
+\mbox{H}(p) &\ =\ p \cdot \log_2 {1 \over p}\\
+\mbox{H}_\mathbf{p} &\ =\ \sum_{i} \mbox{H}(p_i)\\
+\mbox{H}_\mathbf{p|q} &\ =\ \sum_i q_i \sum_{j} \mbox{H}(p_j|q_i)\\
+\end{aligned}$$
+\newpage\ \\[-20pt]
+\textbf{Primer izračuna}\\
+Podano imamo tabelo z vrednostmi atributa in razreda:\\
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{ccp{3cm}}
+\hline
+atribut & razred \\
+\hline
+1 & 1\\
+0 & 0\\
+1 & 0\\
+1 & 1\\
+1 & 0\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}\ \\[-20pt]
+Iz tabele ugotovimo ustrezne verjetnosti in pogojne verjetnosti:
+$$\begin{aligned}
+\mbox{P}(A=0)&={1 \over 5}\\
+\mbox{P}(C=0)&={2 \over 5}\\
+\mbox{P}(C=0\ |\ A=0)&=1\\
+\mbox{P}(C=0\ |\ A=1)&={1 \over 2}
+\end{aligned}$$\ \\[-12pt]
+Sedaj lahko izračunamo informacijski prispevek:
+$$\mbox{Gain}(A) = \mbox{H}\left({2 \over 5},{3 \over 5}\right) - \left({1 \over 5} \cdot \mbox{H}\left( 1, 0 \right) + {4 \over 5} \cdot \mbox{H}\left({1 \over 2},{1 \over 2}\right) \right)=0.17095059445466863$$\ \\[-12pt]
+Zgornji rezultat smo izračunali po formuli s pomočjo programa Mathematica, zelo podoben rezultat pa vrne tudi funkcija Orange.feature.scoring.InfoGain():
+\begin{lstlisting}
+>>> Orange.feature.scoring.InfoGain(0, data)
+0.17095059156417847
+\end{lstlisting}
+Razlika se pojavi na devetem mestu in jo gre najverjetneje pripisati temu, da Mathematica operira z višjo natančnostjo, kot to dopušča pythonski tip float, ki ga uporablja funkcija Infogain.
+\subsection{Permutacijski test}
+Permutacijski test uporabimo za bolj realno oceno kakovosti atributov pri napovedi. Metode za ocenjevanje kakovosti atributov nam dajo nek rezultat, ampak je ta relativen in včasih težko ugotovimo dejansko kvaliteto atributa in ali ga je vredno upoštevati pri nadaljni obravnavi.\\
+
+Permutacijski test izvedemo tako, da z eno od metod za ocenjevanje kakovosti atributov ocenimo kakovost atributa za izbrani razred, nato pa podatke o razredu nekajkrat naključno permutiramo in izračunamo ocene kakovosti atributa nad permutiranimi podatki o razredu. Atribut je za razred informativen, če je njegova ocena kakovosti za ta razred, statistično značilno boljša od ocen, ki smo jih dobili pri naključnih permutacijah razreda.
+
+\section{Rezultati}
+
+Uporabili smo permutacijski test z $n=500$ ponovitvami in stopnjo značilnosti $\alpha=0.05$. Izvajanje programa je trajalo 3 ure, 39 minut in 22 sekund na računalniku s procesorjem Core~2~Duo E8200 2.66GHz. Pri tem je bila uporabljena optimizacija, pri kateri je program preskočil atribut, če je naletel na več kot $n*\alpha=25$ naključnih permutacij razreda z višjim informacijskim prispevkom kot ga je imel prvotni razred.\\
+
+Iz prvega histograma lahko vidimo porazdelitev števila razredov glede na število informativnih atributov. Povprečen razred ima 608 informativnih atributov, sicer pa so vrednosti na intervalu od 215 do 1779 informativnih atributov na razred.
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.3]{attrMap2.pdf}
+\caption{Porazdelitev števila informativnih atributov, glede na število razredov}
+\label{slika1}
+\end{center}
+\end{figure}\ \\[-40pt]
+
+Če statistiko obrnemo, opazimo da je vsak posamezen atribut informativen za več razredov.~Tukaj razpon sega od 9 do 54 razredov na atribut, povprečje pa je pri 24.
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.3]{attrMap3.pdf}
+\caption{Porazdelitev števila razredov, glede na število informativnih atributov}
+\label{slika1}
+\end{center}
+\end{figure}\ \\[-40pt]
+
+Največkrat (54--krat) so informativni atributi: 746, 919, 1203, 1414, 1636
+
+\section{Izjava o izdelavi domače naloge}
+Domačo nalogo in pripadajoče programe sem izdelal sam.
+
+
+\begin{thebibliography}{9}
+
+\bibitem{kononenko}
+   Kononenko Igor,
+   \emph{Machine Learning and Data Mining:
+   Introduction to Priniples and Algorithms.}
+   Horwood Publishing, Chichester, UK,   
+   2007.
+
+\end{thebibliography}
+
+\end{document}
