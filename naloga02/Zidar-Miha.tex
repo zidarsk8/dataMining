@@ -47,7 +47,7 @@
 
 \section{Uvod}
 
-V tej nalogi smo si pogledali odvisnost razredov in atributov. Za"celi smo z diskretizacijo vseh vrednosti na 2 dela; elementi ve"cji od 0 in elementi enaki 0. Nato smo se za vsak par atributov z pomo"cjo permutacijskega testa odlo"cili ali obstaja dovolj zanesljiva povezava med vrednostjo atributa in vrednostjo razreda. 
+V tej nalogi smo si pogledali odvisnost razredov in atributov. Za"celi smo z diskretizacijo vseh vrednosti na 2 dela: elementi ve"cji od 0 in elementi enaki 0. Nato smo se za vsak par atributov z pomo"cjo permutacijskega testa odlo"cili ali obstaja dovolj zanesljiva povezava med vrednostjo atributa in vrednostjo razreda. 
 
 \section{Metode}
 \subsection{Infomacijski prispevek}
@@ -60,14 +60,14 @@ Enačba za izračun informacijskega prispevka je:
 \[\mbox{I}(Y,X)\ =\ \sum_{y\in Y}\ \sum_{x\in X} p(x,y) \log \Bigg(\frac{p(x,y)}{p(x)*p(y)}\Bigg) \]
 
 \subsubsection*{Primer}
-Podani imamo dve naklju"cni spremenljivki, ki v nasi nalogi predstavljata dva stolplca v tabeli. $X$ predstavlja na"s stolpec pod atributom, $Y$ pa vrednosti v nasem razredu.
+Podani imamo dve naklju"cni spremenljivki, ki v na"si nalogi predstavljata dva stolplca v tabeli. $X$ predstavlja na"s stolpec pod atributom, $Y$ pa vrednosti v na"sem razredu.
 \[
  \begin{matrix}
   X & = & (0,0,1,0,0,1) \\
   Y & = & (0,1,1,0,0,1)
  \end{matrix}
 \]
-Sedaj izracunamo vse potrebne verjetnosti.
+Sedaj izra"cunamo vse potrebne verjetnosti.
 \[
 \begin{tabular}{rcl}
   p(X=0) & = & 4/6 \\
@@ -80,22 +80,22 @@ Sedaj izracunamo vse potrebne verjetnosti.
   p(X=1,Y=1) & = & 2/6 \\
 \end{tabular} 
 \]
-Vstavimo te verjetnosti v zgornjo enacbo in dobimo:
+Vstavimo te verjetnosti v zgornjo ena"cbo in dobimo:
 \[ 3/6 \log \Bigg(\frac{3/6}{(4/6)*(3/6)}\Bigg)\ +\ 1/6 \log \Bigg(\frac{1/6}{(4/6)*(3/6)}\Bigg)\ +\ 0 \ +\ 2/6 \log \Bigg(\frac{2/6}{(2/6)*(3/6)}\Bigg)\]
-in octave nam izpise rezultat (kjer aX predstavlja posamezni "clen ena"cbe):
+Ko "stevila vnesmo v octave, nam izpise rezultat (kjer aX predstavlja posamezni "clen ena"cbe):
 \begin{verbatim}
 octave:19> a1+a2+a3+a4
 ans =  0.459147917027245
 \end{verbatim}
-moj program pa za stevili $9$ ($0b1001$) in $25$ ($0b11001$) vrne $0.459147917027$, kar je enako vendar z nekaj decimalnimi mesti manj. Za razliko od Orange orodja ki pa se v povpre"cju razlikuje "ze na sedmem decimalnem mestu, kar sem turi preveril z dodatnim testnim programom ki je racunal povprecno odstopanje od mojih izra"cunanih vrednosti.
+moj program pa za "stevili $9$ ($0b1001$) in $25$ ($0b11001$) vrne $0.459147917027$, kar je enako vendar z nekaj decimalnimi mesti manj. Za razliko od Orange orodja ki pa se v povpre"cju razlikuje "ze na sedmem decimalnem mestu, kar sem tudi preveril z dodatnim testnim programom ki je ra"cunal povpre"cno odstopanje od mojih izra"cunanih vrednosti.
 
 \subsection{Permutacijski test}
 
-Prmutacijski test en izmed na"cinov kako ugotovimo ali je informacijski prispevek na"sega atributa za dani razred dober, ali pa je tak le zaradi naklju"cja. To pa ugotovimo enostavno tako, da primerjamo informacijski prispevek na"sega razreda z mnogimi naklju"cnimi permutacijami tega razreda. Na koncu se odlo"cimo o pomembnosti atributa glede na to, koliko procentov naklju"cnih permutacij je pokazalo vi"sji informacijski prispevek. Tej stopnji zaupanja bomo rekli $alpha$ in spodaj imamo prikazane stevilo pomembnih atributov, ki jih dobimo pri razli"cnih vrednosti $alpha$.\\
-
-Ker smo ra"cunali z dosti podatki, smo pri"sli do "casovnega problema, in sicer navaden permutacijski test za 100 permutacij je trajal priblizno 2h. Iz optimizacijskih razlogov sem se zato odlo"cil da ne uporabljam orange, vendar hranim podatke na druga"cen na"cin in sam ra"cunam informacijski prispevek za te podatke. Tako sem "cas izvajanja zmanj"sal iz 2h na priblizno 3 minute. 
+Prmutacijski test en izmed na"cinov kako ugotovimo ali je informacijski prispevek na"sega atributa za podani razred dober, ali pa je tak le zaradi naklju"cja. To pa ugotovimo enostavno tako, da primerjamo informacijski prispevek na"sega razreda z mnogimi naklju"cnimi permutacijami tega razreda. Na koncu se odlo"cimo o pomembnosti atributa glede na to, koliko procentov naklju"cnih permutacij je pokazalo vi"sji informacijski prispevek. Tej stopnji zaupanja bomo rekli $alpha$ in spodaj imamo prikazano "stevilo pomembnih atributov, ki jih dobimo pri razli"cnih vrednosti $alpha$.\\
 
 \subsection{Program in optimizacija}
+
+Ker smo ra"cunali z dosti podatki, smo pri"sli do "casovnega problema, in sicer navaden permutacijski test za 100 permutacij je trajal priblizno 2h. Iz optimizacijskih razlogov sem se zato odlo"cil da ne uporabljam orange, vendar hranim podatke na druga"cen na"cin in sam ra"cunam informacijski prispevek za te podatke. Tako sem "cas izvajanja zmanj"sal iz 2h na priblizno 3 minute. \\
 
 Ker imamo opravka le z binarnimi atributi, nima smisla vsakega elementa hraniti v seznamu, vendar je prostorsko in procesorsko dosti bolj u"cinkovito "ce posamezne stolpce predstavimo kot navadna "stevila. V taki predstavitvi pa imamo "se eno prednost: za "stetje kje so enake ali razli"cne vrednosti lahko uporabljamo enostavne bitne operacije, ki so mnogo hitrej"se kot operacije nad seznami.\\
 
