@@ -3,11 +3,14 @@ from math import log
 from matplotlib import pyplot
 import numpy 
 
-def multiClassAttr(arr,legend,append="",title='Stevilo pomembnih znacilk za razred'):
+def multiClassAttr(arr,legend,append="",sort=False, title='Stevilo pomembnih znacilk za razred'):
 	plt = []
-	for i in arr:
-		plt.append([len(i["c"+str(y)]) for y in  sorted([int(x[1:]) for x in i])])
-	#plt2 = [len(arr[1]["c"+str(y)]) for y in  sorted([int(x[1:]) for x in arr[1]])]
+	if sort:
+		for i in arr:
+			plt.append([len(i["c"+str(y)]) for y in  sorted([int(x[1:]) for x in i])])
+	else:
+		for i in arr:
+			plt.append([len(i["c"+str(y)]) for y in  ([int(x[1:]) for x in i])])
 	ind = numpy.arange(len(plt[0])) 
 	width = 1
 	fig = pyplot.figure()
@@ -18,7 +21,7 @@ def multiClassAttr(arr,legend,append="",title='Stevilo pomembnih znacilk za razr
 		rects.append(ax.bar(ind, p, width, color=colors[i%len(colors)]))
 	#rects2 = ax.bar(ind, plt[1], width, color='r')
 	ax.set_ylabel('Stevilo znacilk')
-	ax.set_title('Scores by group and gender')
+	ax.set_title(title)
 	ax.set_xlabel("Razred")
 	tup = tuple([r[0] for r in rects])
 	ax.legend( tup, legend )
@@ -35,7 +38,7 @@ def doubleClassAttr(arr1,arr2,append="",title='Stevilo pomembnih znacilk za razr
 	rects1 = ax.bar(ind, plt1, width, color='b')
 	rects2 = ax.bar(ind, plt2, width, color='r')
 	ax.set_ylabel('Stevilo znacilk')
-	ax.set_title('Scores by group and gender')
+	ax.set_title(title)
 	ax.set_xlabel("Razred")
 	ax.legend( ([rects1[0], rects2[0]]), ('<', '<=') )
 	pyplot.savefig("../db"+append+".pdf")

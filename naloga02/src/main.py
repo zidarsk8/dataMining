@@ -164,7 +164,11 @@ attribArr = getAttributTable()
 classArr = getClassTable()
 originalGains = getOriginalGains(attribArr,classArr)
 randomGains = getRandomGains(attribArr,classArr,100)
-relevant = getRelevantAttributes(originalGains, randomGains,0.05);
+relevant00 = getRelevantAttributes(originalGains, randomGains,0.00);
+relevant01 = getRelevantAttributes(originalGains, randomGains,0.01);
+relevant05 = getRelevantAttributes(originalGains, randomGains,0.05);
+relevant10 = getRelevantAttributes(originalGains, randomGains,0.10);
 
-graf.singleClassAttr(relevant)
+graf.singleClassAttr(relevant05)
+graf.multiClassAttr([relevant10,relevant05,relevant01,relevant00],("alpha = 0.10","alpha = 0.05","alpha = 0.01", "alpha = 0.00"),append="raw")
 
