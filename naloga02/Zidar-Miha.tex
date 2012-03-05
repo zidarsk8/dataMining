@@ -114,17 +114,20 @@ Za prikaz rezultatov smo pognali permutacijski test z 500 permutacijami, in re"s
 \end{center}
 \end{figure}
 
-Ena stvar, ki sem jo opazil je, da lahko pri zelo majhni spremembi v kodi (naprimer pogoj za gledanje ali je razred pomemben zamenjamo iz "<=" na "<") lahko dobimo zelo velike spremembe v rezultatih (v enem primeru je stevilo znacilk padlo iz 300 na 50). Zato sem izrisal "se histogram ki prikazuje porazdelitev posameznih vrednosti izra"cunanega informacijskega prispevka pri 2000 permutacijah. Rezultat je bil zelo nepricakovan, vendar je lepo pojasnil velika odstopanja v majhni spremembi pogoja.
+Ena stvar, ki sem jo opazil je, da lahko pri zelo majhni spremembi v kodi (naprimer pogoj za gledanje ali je razred pomemben zamenjamo iz $<=$ na $<$) lahko dobimo zelo velike spremembe v rezultatih (v enem primeru je stevilo znacilk padlo iz 300 na 50). Zato sem izrisal "se histogram ki prikazuje porazdelitev posameznih vrednosti izra"cunanega informacijskega prispevka pri 2000 permutacijah. Rezultat je bil zelo nepricakovan, vendar je lepo pojasnil velika odstopanja v majhni spremembi pogoja.
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale=0.6]{testc40D_1404Orange.pdf}
+\includegraphics[scale=0.4]{testc40D_1404Orange.pdf}
 \caption{porazdelitev info gain za razred c40 pri atributu D\_1404, za 2000 permutacij.}
+\label{slika1}
+\includegraphics[scale=0.4]{muraawdva.pdf}
+\caption{Odstopanje stevila zna"cilk za posamezni razredi pri pogojih $<=$ na $<$ za izlo"canje, ter pri $alpha=0$.}
 \label{slika1}
 \end{center}
 \end{figure}\ \\[-40pt]
 
-Izka"ze se, da je velikokrat dosti enakih vrednosti, kar vidimo "ze iz nizke entropije atributov. Iz tega sklepam da bi bilo bolj smiselno te rezultate primerjati "se z kak"sno drugo mero za ocenjevanje atributov.
+Izka"ze se, da je velikokrat dosti enakih vrednosti, kar vidimo "ze iz nizke entropije atributov. Iz tega sklepam da bi bilo bolj smiselno te rezultate primerjati "se z kak"sno drugo mero za ocenjevanje atributov enkrat v prihodnosti, zaenkrat pa so te rezultati "cisto zadovoljivi.
 
 
 \section{Izjava o izdelavi domače naloge}
