@@ -108,22 +108,24 @@ Ko pa imamo podatke lepo predstavljene, pa potrebujemo "se nekaj extra podatkov,
 Za prikaz rezultatov smo pognali permutacijski test z 500 permutacijami, in re"sitev predstavili z histogramom ki prikazuje koliko pomembnih atributov imamo pri razlicnih alpha vrednostih. Histogram bi sicer dosti lepse zgledal ce bi bil urejen po entropiji posameznega razreda, vendar mi tega "se ni uspelo dokon"cati, saj so podatki lo"ceni med seboj, kar mi je povzro"calo te"zave. V rezultatih pa vidimo kako hitro raste stevilo pomembnih atributov v odvisnosti od alpha, saj ko je alpha $0.1$ so pri nekaterih razredih pomembni skoraj vsi atributi. 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale=0.6]{mu.pdf}
-\caption{Porazdelitev števila informativnih atributov, glede na število razredov}
+\includegraphics[scale=0.6]{muraw.pdf}
+\caption{Prikaz stevila pomembnih atributov za posamezne razrede, pri razlicnih alpha vrednostih.}
 \label{slika1}
 \end{center}
-\end{figure}\ \\[-40pt]
+\end{figure}
 
-Če statistiko obrnemo, opazimo da je vsak posamezen atribut informativen za več razredov.~Tukaj razpon sega od 9 do 54 razredov na atribut, povprečje pa je pri 24.
+Ena stvar, ki sem jo opazil je, da lahko pri zelo majhni spremembi v kodi (naprimer pogoj za gledanje ali je razred pomemben zamenjamo iz "<=" na "<") lahko dobimo zelo velike spremembe v rezultatih (v enem primeru je stevilo znacilk padlo iz 300 na 50). Zato sem izrisal "se histogram ki prikazuje porazdelitev posameznih vrednosti izra"cunanega informacijskega prispevka pri 2000 permutacijah. Rezultat je bil zelo nepricakovan, vendar je lepo pojasnil velika odstopanja v majhni spremembi pogoja.
+
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale=0.6]{mu.pdf}
-\caption{Porazdelitev števila razredov, glede na število informativnih atributov}
+\includegraphics[scale=0.6]{testc40D_1404Orange.pdf}
+\caption{porazdelitev info gain za razred c40 pri atributu D\_1404, za 2000 permutacij.}
 \label{slika1}
 \end{center}
 \end{figure}\ \\[-40pt]
 
-Največkrat (54--krat) so informativni atributi: 746, 919, 1203, 1414, 1636
+Izka"ze se, da je velikokrat dosti enakih vrednosti, kar vidimo "ze iz nizke entropije atributov. Iz tega sklepam da bi bilo bolj smiselno te rezultate primerjati "se z kak"sno drugo mero za ocenjevanje atributov.
+
 
 \section{Izjava o izdelavi domače naloge}
 Domačo nalogo in pripadajoče programe sem izdelal sam.
