@@ -166,5 +166,5 @@ originalGains = getOriginalGains(attribArr,classArr)
 randomGains = getRandomGains(attribArr,classArr,100)
 relevant = getRelevantAttributes(originalGains, randomGains,0.05);
 
-graf.classAttr(relevant)
+graf.singleClassAttr(relevant)
 
