@@ -23,6 +23,7 @@
 *.snm
 *.vrb
 *.swp
+*.csv
 
 *.pyc
 *.pickled
