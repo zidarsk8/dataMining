@@ -17,8 +17,8 @@ def getLabelsArray():
 	print "Reading trainingLabels.csv"
 	tl = open("minidata/trainingLabels.csv")
 	arr = [[int(j) for j in i.strip().split(",")] for i in tl.readlines()]
-	m = max(map(max,arr))+1
-	res = [[int(j in i) for j in range(m)] for i in arr]
+	#m = max(map(max,arr))+1
+	#res = [[int(j in i) for j in range(m)] for i in arr]
 	print "Reading complete: %.3fs" % (time()-t)
-	return res
+	return arr
 
