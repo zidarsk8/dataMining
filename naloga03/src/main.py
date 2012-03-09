@@ -2,25 +2,35 @@
 import data
 import sys
 
-d = data.getDataArray()
-l = data.getLabelsArray()
+d = data.getDataArray(True)
+l = data.getLabelsArray(True)
 stPrimerov = len(l)
 stRazredov = max(map(max,l))+1
-stAtributov = len(d[0])
+stAtributov = max(map(max,d))+1
 
 print stRazredov
 print stPrimerov
 print stAtributov
 
 
-stats = [[[0,0,0,0,0]]*stAtributov]*stRazredov
+print d
 
-for i in xrange(stPrimerov):
-	for a in xrange(stAtributov):
-		for r in l[i]:
-			stats[r][a][0] += d[i][a]
-			stats[r][a][2] += d[i][a]
+stats = [[[0,0,0,0,0] for j in xrange(stAtributov)] for i in xrange(stRazredov)]
 
+for p in xrange(stPrimerov):
+	for attr,val in d[p].items():
+		for clas in l[p]:
+			stats[clas][attr][0] += val
+			stats[clas][attr][2] += 1
+
+
+#
+#for i in xrange(stPrimerov):
+#	for a in xrange(stAtributov):
+#		for r in l[i]:
+#			stats[r][a][0] += d[i][a]
+#			stats[r][a][2] += d[i][a]
+#
 
 
 
