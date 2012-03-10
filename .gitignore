@@ -24,6 +24,7 @@
 *.vrb
 *.swp
 *.csv
+*.pdf
 
 *.pyc
 *.pickled
