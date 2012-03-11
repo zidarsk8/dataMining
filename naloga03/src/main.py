@@ -3,6 +3,7 @@ import data
 import sys
 from math import log
 from sets import Set
+from time import time
 from collections import Counter
 from itertools import chain as Chain
 
@@ -77,11 +78,11 @@ def distDict(a,b):
 	d = 0
 	for i in k:
 		if a.has_key(i) and b.has_key(i):
-			d += (1+min(a[i],b[i]))
+			d += min(a[i],b[i])
 		#elif a.has_key(i):
-		#	d -= (1+a[i])
+		#	d -= 1#(1+a[i])
 		#elif b.has_key(i):
-		#	d -= (1+b[i])
+		#	d -= 1#(1+b[i])
 	return d #float(d)/maxD
 
 
@@ -101,24 +102,17 @@ def getPredictionsRows(trainD,trainL,testD):
 		dd = sorted(dists.iteritems(), key=sk, reverse=True)
 		labs = []
 		avgLabs = 0
-		topK = 10
-		topKi = 4
+		topK = 40
+		topKi = 5
 		for i in range(topKi):
 			labs += trainL[dd[i][0]]
-			avgLabs += len(trainL[dd[i][0]])
 		for i in range(topK):
 			labs += trainL[dd[i][0]]
 			avgLabs += len(trainL[dd[i][0]])
-		num = int((avgLabs/(topK+topKi)))
+		num = int((avgLabs/(topK)))
 		result.append([x[0] for x in Counter.most_common(Counter(labs),num)])
-	print
+	sys.stdout.write("\r                                              \r")
 	return result
-
-
-
-labels = data.getLabelsArray(True)
-rawData = data.getDataArray(True)
-stPrimerov = len(labels)
 
 def precision(t,p):
 	return float(len(Set(t).intersection(Set(p)))) / len(p)
@@ -139,6 +133,16 @@ def avgFscore(t,p):
 	return sum/l
 
 
+labels = data.getLabelsArray(True)
+rawData = data.getDataArray(True)
+stPrimerov = len(labels)
+
+#testData = data.getTestArray(True)
+#predictions = getPredictionsRows(rawData,labels,testData)
+#f = file("result%d.csv" % time(),"w")
+#f.write("\n".join([",".join([str(x) for x in i]) for i in predictions ]))
+#f.flush()
+#f.close()
 
 k = 10;
 print "starting %d fold cross validation" % k
@@ -155,4 +159,15 @@ for i in xrange(k):
 	
 	print "%2d fscore : %.6f" % (i, avgFscore(testL,predictions))
 
+
+labels = data.getLabelsArray(True)
+rawData = data.getDataArray(True)
+stPrimerov = len(labels)
+
+testData = data.getTestArray(True)
+predictions = getPredictionsRows(rawData,labels,testData)
+f = file("result%d.csv" % time(),"w")
+f.write("\n".join([",".join([str(x) for x in i]) for i in predictions ]))
+f.flush()
+f.close()
 

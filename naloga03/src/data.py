@@ -3,6 +3,21 @@ from sets import Set
 import pickle
 import os
 
+def getTestArray(clean=False):
+	pickleFile = 'minidata/testArray.pickled'
+	if not clean and os.path.isfile(pickleFile):
+		print "reading training test from pickle file"
+		return pickle.load(open(pickleFile))
+	else:
+		t = time()
+		print "Reading testData.csv"
+		f = open("minidata/testData.csv")
+		#f = open("minidata/trainingD.csv")
+		a = [[int(y) for y in x.strip().split("\t")] for x in f.readlines()]
+		#pickle.dump(a,file(pickleFile,"w"),-1)
+		print "Reading complete: %.3fs" % (time()-t)
+	return a
+
 def getDataArray(clean=False):
 	pickleFile = 'minidata/dataArray.pickled'
 	if not clean and os.path.isfile(pickleFile):
