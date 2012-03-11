@@ -4,27 +4,61 @@ import sys
 from collections import Counter
 from itertools import chain as Chain
 
-d,ds = data.getDataArray()
-l = data.getLabelsArray()
-lc = Counter(Chain(*l))
-stPrimerov = len(l)
+def getLearningSet(d,l):
+	stats = {}
+	for p in xrange(len(d)):
+		for attr,val in d[p].items():
+			for clas in l[p]:
+				if not stats.has_key(clas):
+					stats[clas] = {}
+				if not stats[clas].has_key(attr):
+					stats[clas][attr] = [0,0,0]
+				stats[clas][attr][0] += val
+				stats[clas][attr][1] += 1
+	return stats
+
+def getLinePrediction(line,stats,ds,ls):
+	result = {}
+	for i,j in stats.items():
+		result[i] = 0
+		for ii, jj in j.items():
+			print jj
+
+def getPredictions(testData,stats,ds,ls):
+	result = []
+	return result
+
+
+
+od,ds = data.getDataArray()
+ol = data.getLabelsArray()
+ls = Counter(Chain(*ol))
+stPrimerov = len(ol)
+
+k = 10;
+results = []
+print "starting %d fold cross validation" % k
+for i in xrange(k):
+	sys.stdout.write("\r%2s/%2d done" % (i+1,k))
+	f = stPrimerov/k * i
+	t = stPrimerov/k * (i+1)
+	# razdelimo podatke na 2 mnozici
+	d = od[:f]+od[t:]
+	testD = od[f:t]
+	l = ol[:f]+ol[t:]
+	testL = ol[f:t]
+	stats = getLearningSet(d,l)
+	results = getPredictions(testD,stats,ds,ls)
+print ""
+
+print results
+	
 
 #print stPrimerov
 #print d
 #print ds
 #print lc
 
-
-stats = {}
-for p in xrange(stPrimerov):
-	for attr,val in d[p].items():
-		for clas in l[p]:
-			if not stats.has_key(clas):
-				stats[clas] = {}
-			if not stats[clas].has_key(attr):
-				stats[clas][attr] = [0,0,0]
-			stats[clas][attr][0] += val
-			stats[clas][attr][1] += 1
 
 # ta kos kode pokaze da stevilo razredov ni odvisno od
 # stevila nenicelnih atributov, saj je to povprecje enako
