@@ -100,7 +100,7 @@ for i,t in enumerate(tes):
 	result.append([i for i,j in sorted(r, key=sk, reverse=True)])
 
 
-f = file("nn%d.csv" % time(),"w")
+f = file("results/nn%d.csv" % time(),"w")
 f.write("\n".join([",".join([str(x) for x in i]) for i in result ]))
 f.flush()
 f.close()

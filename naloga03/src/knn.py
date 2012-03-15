@@ -24,53 +24,53 @@ def getDataDict(a):
 				sta[i][1] += 1
 	return (arr,sta)
 
-def getDataStats(d,l):
-	stats = {}
-	for p in xrange(len(d)): #za vsak primer
-		for attr,val in d[p].items(): #gremo po atributih
-			for clas in l[p]: # in vseh razredih
-				if not stats.has_key(clas):
-					stats[clas] = {}
-				if not stats[clas].has_key(attr):
-					stats[clas][attr] = [0,0,0]
-				stats[clas][attr][0] += val
-				stats[clas][attr][1] += 1
-	return stats
+#def getDataStats(d,l):
+#	stats = {}
+#	for p in xrange(len(d)): #za vsak primer
+#		for attr,val in d[p].items(): #gremo po atributih
+#			for clas in l[p]: # in vseh razredih
+#				if not stats.has_key(clas):
+#					stats[clas] = {}
+#				if not stats[clas].has_key(attr):
+#					stats[clas][attr] = [0,0,0]
+#				stats[clas][attr][0] += val
+#				stats[clas][attr][1] += 1
+#	return stats
+#
+#def getLinePrediction(line,stats,ds,ls):
+#	result = {}
+#	for i,j in stats.items():
+#		result[i] = 0
+#		for ii, jj in j.items():
+#			print jj
+#
+#def getPredictionsEachAttr(trainD,trainL,testD):
+#	result = []
+#	d, ds = getDataDict(trainD)
+#	l = list(trainL)
+#	ls = Counter(Chain(*l))
+#	stats = getDataStats(d,l)
+#	for i in testD:
+#		curRes = {}
+#		for label, labelcount in ls.items():
+#			curRes[label] = 0 # zacetna verjenost za razred i
+#			for attr in testD[i]:
+#				if testD[i][attr] != 0 and stats[label].has_key(attr):
+#					curRes[label] += testD[i][attr]
+#		result.append(curRes)
+#	return result
 
-def getLinePrediction(line,stats,ds,ls):
-	result = {}
-	for i,j in stats.items():
-		result[i] = 0
-		for ii, jj in j.items():
-			print jj
-
-def getPredictionsEachAttr(trainD,trainL,testD):
-	result = []
-	d, ds = getDataDict(trainD)
-	l = list(trainL)
-	ls = Counter(Chain(*l))
-	stats = getDataStats(d,l)
-	for i in testD:
-		curRes = {}
-		for label, labelcount in ls.items():
-			curRes[label] = 0 # zacetna verjenost za razred i
-			for attr in testD[i]:
-				if testD[i][attr] != 0 and stats[label].has_key(attr):
-					curRes[label] += testD[i][attr]
-		result.append(curRes)
-	return result
-
-def dist(a,b):
-	l = min(len(a),len(b))
-	d = 0
-	maxD = 0
-	for i in xrange(l):
-		maxD += log(1+max(a[i],b[i]))
-		if min(a[i],b[i]) == 0:
-			d -= log(1+max(a[i],b[i]))
-		else:
-			d += log(1+min(a[i],b[i]))
-	return d #float(d)/maxD
+#def dist(a,b):
+#	l = min(len(a),len(b))
+#	d = 0
+#	maxD = 0
+#	for i in xrange(l):
+#		maxD += log(1+max(a[i],b[i]))
+#		if min(a[i],b[i]) == 0:
+#			d -= log(1+max(a[i],b[i]))
+#		else:
+#			d += log(1+min(a[i],b[i]))
+#	return d #float(d)/maxD
 
 def distDict(a,b):
 	l = min(len(a),len(b))
@@ -100,6 +100,7 @@ def getPredictionsRows(trainD,trainL,testD):
 			dists[i] = distDict(j,primer)
 		def sk(x): return x[1]
 		dd = sorted(dists.iteritems(), key=sk, reverse=True)
+		#TODO: eno bl pametno ibiranje razredov
 		labs = []
 		avgLabs = 0
 		topK = 40
@@ -111,6 +112,7 @@ def getPredictionsRows(trainD,trainL,testD):
 			avgLabs += len(trainL[dd[i][0]])
 		num = int((avgLabs/(topK)))
 		result.append([x[0] for x in Counter.most_common(Counter(labs),num)])
+		# dodamo num najbolj pogostih pojavljenih razredov ^
 	sys.stdout.write("\r                                              \r")
 	return result
 

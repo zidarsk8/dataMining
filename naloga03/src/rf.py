@@ -1,4 +1,5 @@
 from time import time
+import cPickle
 import sys
 import Orange
 import jrs
@@ -35,11 +36,9 @@ for ci, clas in enumerate(mld.classes):
 		
 print
 
-
-def sk(x): return x[1]
 sortedRes = [sorted(x.iteritems(), key=lambda x: x[1], reverse=True) for x in results]
 		
 for i in sortedRes[1]:
 	print i 
 
-cPickle(sortedRes,open("rf-sotedRes-%d-trees-%d.pickle" % (nof,time()),"w"))
+cPickle(sortedRes,open("minidata/rf-sotedRes-%d-trees-%d.pickle" % (nof,time()),"w"))
