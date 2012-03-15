@@ -1,19 +1,23 @@
+from time import time
 import sys
 import Orange
 import jrs
 reload(jrs)
 
+#change empty features to 10 for real results and 40+ for testing
 #raw = jrs.RawData()
 #raw.remove_empty_features(40)
 #raw.convert_to_orange()
 #exit()
+
+nof = 5
 
 mld = jrs.Data()
 
 trainSet = mld.ml_data
 testSet = mld.test_data
 
-forest = Orange.ensemble.forest.RandomForestLearner(trees = 2)
+forest = Orange.ensemble.forest.RandomForestLearner(trees = nof)
 
 tl = len(testSet)
 cl = len(mld.classes)
@@ -33,6 +37,9 @@ print
 
 
 def sk(x): return x[1]
-dd = sorted(results[1].iteritems(), key=sk, reverse=True)
+sortedRes = [sorted(x.iteritems(), key=lambda x: x[1], reverse=True) for x in results]
 		
-print dd
+for i in sortedRes[1]:
+	print i 
+
+cPickle(sortedRes,open("rf-sotedRes-%d-trees-%d.pickle" % (nof,time()),"w"))
