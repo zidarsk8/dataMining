@@ -5,9 +5,9 @@ import Orange
 import jrs
 reload(jrs)
 
-#change empty features to 10 for real results and 40+ for testing
+##change empty features to 10 for real results and 40+ for testing
 #raw = jrs.RawData()
-#raw.remove_empty_features(40)
+#raw.remove_empty_features(10)
 #raw.convert_to_orange()
 #exit()
 
@@ -41,4 +41,12 @@ sortedRes = [sorted(x.iteritems(), key=lambda x: x[1], reverse=True) for x in re
 for i in sortedRes[1]:
 	print i 
 
-cPickle(sortedRes,open("minidata/rf-sotedRes-%d-trees-%d.pickle" % (nof,time()),"w"))
+cPickle.dump(sortedRes,open("minidata/rf-sotedRes-%d-trees-%d.pickle" % (nof,time()),"w"))
+
+
+
+
+
+
+
+
