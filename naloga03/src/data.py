@@ -1,3 +1,6 @@
+from collections import Counter
+from itertools import chain
+from random import shuffle
 from time import time
 from sets import Set
 import cPickle
@@ -57,4 +60,66 @@ def filterArr(arr, badAttributes):
 	aa = zip(*arr)
 	[aa.pop(i) for i in sorted(badAttributes,reverse=True)]
 	return zip(*aa)
+
+def removeLeastCommonData(oData, oLabels, least=5):
+	data = oData[:]
+	labels = oLabels[:]
+	c = Counter(chain(*labels))
+	lc = Counter.most_common(c)
+	bb = sorted(list(Set([j for i,j in lc])))
+	a = [x[0] for x in lc if x[1] < bb[5]]
+	rem = [i for i,j in enumerate(labels) if len(Set(j).intersection(Set(a))) > 0 ]
+	[labels.pop(x) for x in sorted(rem, reverse=True)]
+	[data.pop(x) for x in sorted(rem, reverse=True)]
+	return (data, labels)
+
+def removeMostCommonData(oData, oLabels, count=20):
+	data = oData[:]
+	labels = oLabels[:]
+	for iafsa in range(count):
+		c = Counter(chain(*labels))
+		lc = Counter.most_common(c)
+		dlc = {}
+		for l in lc: dlc[l[0]] = l[1]
+		teze = [max([ dlc[y] for y in x])  for x in labels]
+		teze = sorted([(y,x) for x,y in enumerate(teze)])
+		rem = [x[1] for x in teze[-10:]]
+		[labels.pop(x) for x in sorted(rem, reverse=True)]
+		[data.pop(x) for x in sorted(rem, reverse=True)]
+	return (data, labels)
+
+# podvoji vrstice v katerih nastopajo atributi z zelo malo pojavitvami
+def addFakeData(oData,oLabels,count=100,low=10):
+	data = oData[:]
+	labels = oLabels[:]
+	for iafsa in range(count):
+		c = Counter(chain(*labels))
+		lc = Counter.most_common(c)
+	
+		dlc = {}
+		for l in lc: dlc[l[0]] = l[1]
+	
+		#teze = [sum([ dlc[y]**2 for y in x])  for x in labels]
+		teze = [sum([ dlc[y] for y in x])  for x in labels]
+		teze = sorted([(y,x) for x,y in enumerate(teze)])
+		tt = teze[:max(low*10,200)]
+		shuffle(tt)
+		duplicate = [x[1] for x in tt[:low]]
+		dLabels = [labels[i][:] for i in duplicate]
+		dData = [labels[i][:] for i in duplicate]
+		for ii in range(1):
+			for i in range(len(duplicate)):
+				labels.append(dLabels[i])
+				data.append(dData[i])
+	#shuflamo vrstice da niso vec lepo, pa poskrbimo da labele ostanejo 
+	#pri svojem primeru
+	sd = []
+	[sd.append((data[i],labels[i])) for i in xrange(len(data))]
+	shuffle(sd)
+	ll = []
+	dd = []
+	for x,y in sd:
+		dd.append(x)
+		ll.append(y)
+	return (dd, ll)
 
