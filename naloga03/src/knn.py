@@ -135,19 +135,17 @@ def avgFscore(t,p):
 	return sum/l
 
 
-labels = data.getLabelsArray(True)
-rawData = data.getDataArray(True)
+labels = data.getLabelsArray()
+rawData = data.getDataArray()
 stPrimerov = len(labels)
 
-#testData = data.getTestArray(True)
-#predictions = getPredictionsRows(rawData,labels,testData)
-#f = file("result%d.csv" % time(),"w")
-#f.write("\n".join([",".join([str(x) for x in i]) for i in predictions ]))
-#f.flush()
-#f.close()
+#bad = data.getBadAttributes(rawData,10)
+#rawData = data.filterArr(rawData,bad)
 
 k = 10;
 print "starting %d fold cross validation" % k
+print "number of cases: %d" % len(rawData)
+print "number of attributes: %d" % len(rawData[0])
 for i in xrange(k):
 	#sys.stdout.write("\r%2s/%2d done" % (i+1,k))
 	f = stPrimerov/k * i
@@ -162,14 +160,14 @@ for i in xrange(k):
 	print "%2d fscore : %.6f" % (i, avgFscore(testL,predictions))
 
 
-labels = data.getLabelsArray(True)
-rawData = data.getDataArray(True)
-stPrimerov = len(labels)
-
-testData = data.getTestArray(True)
-predictions = getPredictionsRows(rawData,labels,testData)
-f = file("result%d.csv" % time(),"w")
-f.write("\n".join([",".join([str(x) for x in i]) for i in predictions ]))
-f.flush()
-f.close()
-
+#labels = data.getLabelsArray(True)
+#rawData = data.getDataArray(True)
+#stPrimerov = len(labels)
+#
+#testData = data.getTestArray(True)
+#predictions = getPredictionsRows(rawData,labels,testData)
+#f = file("result%d.csv" % time(),"w")
+#f.write("\n".join([",".join([str(x) for x in i]) for i in predictions ]))
+#f.flush()
+#f.close()
+#
