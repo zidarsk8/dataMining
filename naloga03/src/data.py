@@ -106,7 +106,7 @@ def addFakeData(oData,oLabels,count=100,low=10):
 		shuffle(tt)
 		duplicate = [x[1] for x in tt[:low]]
 		dLabels = [labels[i][:] for i in duplicate]
-		dData = [labels[i][:] for i in duplicate]
+		dData = [data[i][:] for i in duplicate]
 		for ii in range(1):
 			for i in range(len(duplicate)):
 				labels.append(dLabels[i])
