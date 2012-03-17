@@ -11,9 +11,9 @@ def prepairCsv(filter=10):
 	raw.remove_empty_features(filter)
 	raw.convert_to_orange()
 
-prepairCsv(5)
+prepairCsv(50)
 
-numOfTrees = 100
+numOfTrees = 5
 
 mld = jrs.Data()
 trainSet = mld.ml_data
@@ -53,3 +53,4 @@ for r in sortedRes:
 	#if len(rr[-1]) == 1 and r[0][1]*0.4 < r[1][1]:
 	#	rr[-1].append(r[1][0])
 
+data.resultToCsv(rr,"rf_%d.csv" % time())
