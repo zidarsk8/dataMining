@@ -1,5 +1,6 @@
 from time import time
 import cPickle
+import data
 import sys
 import Orange
 import jrs
@@ -11,9 +12,9 @@ def prepairCsv(filter=10):
 	raw.remove_empty_features(filter)
 	raw.convert_to_orange()
 
-prepairCsv(50)
+prepairCsv(3)
 
-numOfTrees = 5
+numOfTrees = 100
 
 mld = jrs.Data()
 trainSet = mld.ml_data
@@ -39,18 +40,12 @@ print
 
 sortedRes = [sorted(x.iteritems(), key=lambda x: x[1], reverse=True) for x in results]
 		
-for i in sortedRes:
-	print i 
-
-cPickle.dump(sortedRes,open("minidata/rf-sotedRes-%d-trees-%d.pickle" % (numOfTrees,time()),"w"))
-
+cPickle.dump(sortedRes,open("minidata/rf-sotedRes-%d-trees-%d.pickled" % (numOfTrees,time()),"w"))
 
 rr = []
 for r in sortedRes:
 	m = r[0][1]
 	rr.append([x[0][1:] for i,x in enumerate(r) if x[1] > m*(0.3+(i/50.0))])
-	#rr.append([x[0] for x in r if x[1]> m*0.6])
-	#if len(rr[-1]) == 1 and r[0][1]*0.4 < r[1][1]:
-	#	rr[-1].append(r[1][0])
 
 data.resultToCsv(rr,"rf_%d.csv" % time())
+

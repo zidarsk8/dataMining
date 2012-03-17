@@ -127,7 +127,7 @@ def resultToCsv(arr,fn=""):
 	if fn == "":
 		fn = "result_%d.csv" % time()
 	f = file(fn,"w")
-	f.write("\n".join([" ".join([str(x).replace("c","") for x in i]) for i in predictions ]))
+	f.write("\n".join([" ".join([str(x).replace("c","") for x in i]) for i in arr ]))
 	f.flush()
 	f.close()
 	
