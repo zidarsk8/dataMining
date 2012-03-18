@@ -1,0 +1,78 @@
+ 0 fscore : 0.400097                          
+ 1 fscore : 0.372909                          
+ 2 fscore : 0.435614                          
+ 3 fscore : 0.401204                          
+ 4 fscore : 0.381352                          
+ 5 fscore : 0.393711                          
+ 6 fscore : 0.435698                          
+ 7 fscore : 0.381779                          
+ 8 fscore : 0.380660                          
+ 9 fscore : 0.372240                          
+povpreceno (0.600000,50) : 0.395526
+ 0 fscore : 0.400097                          
+ 1 fscore : 0.372909                          
+ 2 fscore : 0.435614                          
+ 3 fscore : 0.401204                          
+ 4 fscore : 0.381352                          
+ 5 fscore : 0.393711                          
+ 6 fscore : 0.435698                          
+ 7 fscore : 0.381779                          
+ 8 fscore : 0.380660                          
+ 9 fscore : 0.372240                          
+povpreceno (0.600000,40) : 0.395526
+ 0 fscore : 0.400097                          
+ 1 fscore : 0.372909                          
+ 2 fscore : 0.435614                          
+ 3 fscore : 0.401204                          
+ 4 fscore : 0.381352                          
+ 5 fscore : 0.393711                          
+ 6 fscore : 0.435698                          
+ 7 fscore : 0.381779                          
+ 8 fscore : 0.380660                          
+ 9 fscore : 0.372240                          
+povpreceno (0.600000,30) : 0.395526
+ 0 fscore : 0.400097                          
+ 1 fscore : 0.372909                          
+ 2 fscore : 0.435614                          
+ 3 fscore : 0.401204                          
+ 4 fscore : 0.381352                          
+ 5 fscore : 0.393711                          
+ 6 fscore : 0.435698                          
+ 7 fscore : 0.381779                          
+ 8 fscore : 0.380660                          
+ 9 fscore : 0.372240                          
+povpreceno (0.600000,20) : 0.395526
+ 0 fscore : 0.400283                          
+ 1 fscore : 0.372528                          
+ 2 fscore : 0.435614                          
+ 3 fscore : 0.399942                          
+ 4 fscore : 0.381014                          
+ 5 fscore : 0.393583                          
+ 6 fscore : 0.435595                          
+ 7 fscore : 0.381974                          
+ 8 fscore : 0.381217                          
+ 9 fscore : 0.372743                          
+povpreceno (0.600000,10) : 0.395449
+ 0 fscore : 0.395995                          
+ 1 fscore : 0.373025                          
+ 2 fscore : 0.431016                          
+ 3 fscore : 0.400843                          
+ 4 fscore : 0.379382                          
+ 5 fscore : 0.390846                          
+ 6 fscore : 0.436765                          
+ 7 fscore : 0.379136                          
+ 8 fscore : 0.373951                          
+ 9 fscore : 0.370283                          
+povpreceno (0.600000,5) : 0.393124
+ 0 fscore : 0.412585                          
+ 1 fscore : 0.404686                          
+ 2 fscore : 0.434594                          
+ 3 fscore : 0.405178                          
+ 4 fscore : 0.414532                          
+ 5 fscore : 0.397843                          
+ 6 fscore : 0.436539                          
+ 7 fscore : 0.408263                          
+ 8 fscore : 0.390957                          
+ 9 fscore : 0.391484                          
+povpreceno (0.500000,50) : 0.409666
+

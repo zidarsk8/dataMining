@@ -141,20 +141,22 @@ def avgFscore(t,p):
 	return sum/l
 
 
-labels = data.getLabelsArray()
-rawData = data.getDataArray()
+labels = data.getLabelsArray()[:1000]
+rawData = data.getDataArray()[:1000]
 stPrimerov = len(labels)
 
-#bad = data.getBadAttributes(rawData,10)
-#rawData = data.filterArr(rawData,bad)
+
+
+bad = data.getBadAttributes(rawData,10)
+rawData = data.filterArr(rawData,bad)
 
 k = 10;
 print "starting %d fold cross validation" % k
 print "number of cases: %d" % len(rawData)
 print "number of attributes: %d" % len(rawData[0])
 
-tolerance = [0.1,0.2,0.3,0.4,0.5,0.6]
-meja = [5,10,20,30,40,50]
+tolerance = [0.6,0.5,0.4,0.3]
+meja = [50,40,30,20,10,5]
 allTests = {}
 for tol in tolerance:
 	for mej in meja:
