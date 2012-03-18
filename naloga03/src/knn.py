@@ -155,8 +155,8 @@ print "starting %d fold cross validation" % k
 print "number of cases: %d" % len(rawData)
 print "number of attributes: %d" % len(rawData[0])
 
-tolerance = [0.6,0.5,0.4,0.3]
-meja = [50,40,30,20,10,5]
+tolerance = [a/100.0 for a in range(40,50) if a%2 == 0]
+meja = [10,12,14,16,18,20]
 allTests = {}
 for tol in tolerance:
 	for mej in meja:
