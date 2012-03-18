@@ -76,18 +76,19 @@ def distDict(a,b):
 	l = min(len(a),len(b))
 	k = Set(a.keys()+b.keys())
 	d = 0
+	maxD = 0
 	for i in k:
-		if a.has_key(i) and b.has_key(i):
-			d += min(a[i],b[i])
-		#elif a.has_key(i):
-		#	d -= 1#(1+a[i])
-		#elif b.has_key(i):
-		#	d -= 1#(1+b[i])
-	return d #float(d)/maxD
+		aa = a[i] if a.has_key(i) else 0
+		bb = b[i] if b.has_key(i) else 0
+		d += log(min(aa,bb)+1)
+		maxD += log(max(aa,bb)+1)
+	return float(d)/maxD
 
 
 
 def getPredictionsRows(trainD,trainL,testD):
+	def sk(x): return x[1]
+	allLabels = list(Set(Chain(*trainL)))
 	result = []
 	abc = len(testD)
 	train, trainStats = getDataDict(trainD)
@@ -98,23 +99,25 @@ def getPredictionsRows(trainD,trainL,testD):
 		dists = {}
 		for i,j in enumerate(train):
 			dists[i] = distDict(j,primer)
-		def sk(x): return x[1]
 		dd = sorted(dists.iteritems(), key=sk, reverse=True)
-		#TODO: eno bl pametno ibiranje razredov
-		labs = []
-		avgLabs = 0
-		topK = 40
-		topKi = 5
-		for i in range(topKi):
-			labs += trainL[dd[i][0]]
-		for i in range(topK):
-			labs += trainL[dd[i][0]]
-			avgLabs += len(trainL[dd[i][0]])
-		num = int((avgLabs/(topK)))
-		result.append([x[0] for x in Counter.most_common(Counter(labs),num)])
-		# dodamo num najbolj pogostih pojavljenih razredov ^
+		res = {}
+		for i in allLabels:
+			res[i] = 0
+		for i in range(100):
+			for j in trainL[dd[i][0]]:
+				res[j] += (100.0-i)/100
+		rs = sorted(res.iteritems(), key=sk, reverse=True)
+		result.append(rs)
 	sys.stdout.write("\r                                              \r")
 	return result
+
+def getKnnResults(trainD,trainL,testD):
+	pred = getPredictionsRows(trainD,trainL,testD)
+	rr = []
+	for r in sortedRes:
+		rr.append([x[0][1:] for i,x in enumerate(r) if x[1] > r[0][1]*(0.3+(i/50.0))])
+	return rr
+
 
 def precision(t,p):
 	return float(len(Set(t).intersection(Set(p)))) / len(p)
@@ -146,6 +149,7 @@ k = 10;
 print "starting %d fold cross validation" % k
 print "number of cases: %d" % len(rawData)
 print "number of attributes: %d" % len(rawData[0])
+aaa = 0
 for i in xrange(k):
 	#sys.stdout.write("\r%2s/%2d done" % (i+1,k))
 	f = stPrimerov/k * i
@@ -155,10 +159,13 @@ for i in xrange(k):
 	testD = rawData[f:t]
 	testL = labels[f:t]
 	
-	predictions = getPredictionsRows(trainD,trainL,testD)
-	
-	print "%2d fscore : %.6f" % (i, avgFscore(testL,predictions))
+	predictions = getKnnResults(trainD,trainL,testD)
 
+	avgf = avgFscore(testL,predictions)
+	aaa += avgf
+	print "%2d fscore : %.6f" % (i, avgf)
+
+#print "povpreceno: %.6f" % aaa/k
 
 #labels = data.getLabelsArray(True)
 #rawData = data.getDataArray(True)
