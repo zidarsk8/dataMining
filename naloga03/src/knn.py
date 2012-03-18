@@ -97,8 +97,10 @@ def getPredictionsRows(trainD,trainL,testD):
 		sys.stdout.flush()
 		sys.stdout.write("\r calculating classes %5d/%d " %(ab+1,abc))
 		dists = {}
+		maxDist = 0
 		for i,j in enumerate(train):
 			dists[i] = distDict(j,primer)
+			maxDist = max(dists[i],maxDist)
 		dd = sorted(dists.iteritems(), key=sk, reverse=True)
 		res = {}
 		for i in allLabels:
@@ -106,6 +108,7 @@ def getPredictionsRows(trainD,trainL,testD):
 		for i in range(100):
 			for j in trainL[dd[i][0]]:
 				res[j] += (100.0-i)/100
+				#res[j] += (float(dd[i][1])/maxDist)/100.0
 		rs = sorted(res.iteritems(), key=sk, reverse=True)
 		result.append(rs)
 	sys.stdout.write("\r                                              \r")
@@ -115,7 +118,7 @@ def getKnnResults(trainD,trainL,testD):
 	pred = getPredictionsRows(trainD,trainL,testD)
 	rr = []
 	for r in pred:
-		rr.append([x[0] for i,x in enumerate(r) if x[1] > r[0][1]*(0.3+(i/50.0))])
+		rr.append([x[0] for i,x in enumerate(r) if x[1] > r[0][1]*(0.2+(i/50.0))])
 	return rr
 
 
@@ -150,6 +153,7 @@ print "starting %d fold cross validation" % k
 print "number of cases: %d" % len(rawData)
 print "number of attributes: %d" % len(rawData[0])
 aaa = 0
+allPred = []
 for i in xrange(k):
 	#sys.stdout.write("\r%2s/%2d done" % (i+1,k))
 	f = stPrimerov/k * i
@@ -160,12 +164,13 @@ for i in xrange(k):
 	testL = labels[f:t]
 	
 	predictions = getKnnResults(trainD,trainL,testD)
+	allPred += predictions
 
 	avgf = avgFscore(testL,predictions)
 	aaa += avgf
 	print "%2d fscore : %.6f" % (i, avgf)
 
-#print "povpreceno: %.6f" % aaa/k
+print "povpreceno: %.6f" % (aaa/k)
 
 #labels = data.getLabelsArray(True)
 #rawData = data.getDataArray(True)
