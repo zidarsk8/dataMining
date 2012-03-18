@@ -44,8 +44,7 @@ cPickle.dump(sortedRes,open("minidata/rf-sotedRes-%d-trees-%d.pickled" % (numOfT
 
 rr = []
 for r in sortedRes:
-	m = r[0][1]
-	rr.append([x[0][1:] for i,x in enumerate(r) if x[1] > m*(0.2+(i/30.0))])
+	rr.append([x[0][1:] for i,x in enumerate(r) if x[1] > r[0][1]*(0.2+(i/30.0))])
 
 data.resultToCsv(rr,"rf_%d.csv" % time())
 
