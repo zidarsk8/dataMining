@@ -114,8 +114,8 @@ def getPredictionsRows(trainD,trainL,testD):
 def getKnnResults(trainD,trainL,testD):
 	pred = getPredictionsRows(trainD,trainL,testD)
 	rr = []
-	for r in sortedRes:
-		rr.append([x[0][1:] for i,x in enumerate(r) if x[1] > r[0][1]*(0.3+(i/50.0))])
+	for r in pred:
+		rr.append([x[0] for i,x in enumerate(r) if x[1] > r[0][1]*(0.3+(i/50.0))])
 	return rr
 
 
