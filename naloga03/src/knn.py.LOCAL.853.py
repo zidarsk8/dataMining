@@ -107,8 +107,6 @@ def getPredictionsRows(trainD,trainL,testD):
 			res[i] = 0
 		for i in range(100):
 			for j in trainL[dd[i][0]]:
-				#Integrate[(Cos[Pi*(x/y)] + 1)^2, x]
-				#Plot[(Cos[Pi*(x/15)] + 1)^2/4, {x, 0, 15}]
 				res[j] += (100.0-i)/100
 				#res[j] += (float(dd[i][1])/maxDist)/100.0
 		rs = sorted(res.iteritems(), key=sk, reverse=True)
@@ -149,14 +147,14 @@ def avgFscore(t,p):
 	return sum/l
 
 
-labels = data.getLabelsArray()
-rawData = data.getDataArray()
+labels = data.getLabelsArray()[:1000]
+rawData = data.getDataArray()[:1000]
 stPrimerov = len(labels)
 
 
 
-#bad = data.getBadAttributes(rawData,10)
-#rawData = data.filterArr(rawData,bad)
+bad = data.getBadAttributes(rawData,10)
+rawData = data.filterArr(rawData,bad)
 
 k = 10;
 print "starting %d fold cross validation" % k

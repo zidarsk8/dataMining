@@ -12,7 +12,7 @@ def prepairCsv(filter=10):
 	raw.remove_empty_features(filter)
 	raw.convert_to_orange()
 
-prepairCsv(3)
+prepairCsv()
 
 numOfTrees = 100
 
@@ -40,11 +40,11 @@ print
 
 sortedRes = [sorted(x.iteritems(), key=lambda x: x[1], reverse=True) for x in results]
 		
-cPickle.dump(sortedRes,open("minidata/rf-sotedRes-%d-trees-%d.pickled" % (numOfTrees,time()),"w"))
+cPickle.dump(sortedRes,open("minidata/rf-discrete-sotedRes-%d-trees-%d.pickled" % (numOfTrees,time()),"w"))
 
 rr = []
 for r in sortedRes:
 	rr.append([x[0][1:] for i,x in enumerate(r) if x[1] > r[0][1]*(0.2+(i/30.0))])
 
-data.resultToCsv(rr,"rf_%d.csv" % time())
+data.resultToCsv(rr,"rf_bin_log_%d_02_30.csv" % time())
 

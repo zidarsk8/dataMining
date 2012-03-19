@@ -67,12 +67,17 @@ To je eden od mo"znih na"cinov ocenjevanja napovedi. Sestavljena je iz ocen prec
 
 \item[Naklju"cni gozd] (random forest, v nadaljevanju RF) je algoritem ki iz u"cne mno"zice podatkov zgradi $n$ odlo"citvenih dreves in sestavi napoved iz posameznih napovedi teh dreves. Tukaj sem uporabil RF iz knji"znice Orange z privzetimi nastavitvami za 100 dreves. Da sem pa RF pomagal, sem med tribute v testni in u"cni mno"zici dodal se binarne vrednosti teh atributov.
 
-\item[Kombinacija: ] Posebaj pa sem probaval tudi razlicne metode kombiniranja rezultatov pridobljenih iz zgoraj navedenih metod. Tukaj sem probal dva pristopa. Prvi je bil kombiniranje kon"cnih rezultatov, drugi in bolj"si pristop pa je bil kombiniranje verjetnosti, ki jih posamezna metoda vrne, ter nato sestavljanje kon"cnih rezultatov. 
+\item[Kombinacija: ] Posebaj pa sem probaval tudi razlicne metode kombiniranja rezultatov pridobljenih iz zgoraj navedenih metod. Tukaj sem probal dva pristopa. Prvi je bil kombiniranje kon"cnih rezultatov, drugi in bolj"si pristop pa je bil kombiniranje verjetnosti, ki jih posamezna metoda vrne, ter nato sestavljanje kon"cnih rezultatov. \\
 
 \end{description}
 
 \subsubsection*{Kalibracija in izbor podatkov}
-Glavni del, pa ni bil optimizacija ali kalibracija algoritmov, vendar izbiranje rezultatov za vsak algoritem. Temu sem tudi namenil najve"c "casa. Za kalibracijo "cim bolj"sega "stevila napovedanih razredov, sem prav tako uporabljla F-oceno z k-kratnim pre"cnim preverjanjem, vendar na mnogo manj"si mno"zici podatkov(1000 primerov in manjk kot 400 atributov). 
+Glavni del, pa ni bil optimizacija ali kalibracija algoritmov, vendar izbiranje rezultatov za vsak algoritem. Temu sem tudi namenil najve"c "casa. Za kalibracijo "cim bolj"sega "stevila napovedanih razredov, sem prav tako uporabljla F-oceno z k-kratnim pre"cnim preverjanjem, vendar na mnogo manj"si mno"zici podatkov(1000 primerov in manjk kot 400 atributov). \\
+
+\subsubsection*{Koda modelov}
+
+Omeniti moram da sem zdru"zevanje rezultatov delal ro"cno v konzoli, vendar funkcija je vseeno zapisana v pomozni datoteki \textit{data.py} Napovedna modela se nahajata v datotekah z istim imenom (\textit{knn.py} za k najblji"zjih ter \textit{rf.py} za random forest). Zraven pa sem naredil "se nakaj skript ki so mi pomagale z delom z podatki, kot so branje, normalizacija tabel, zdru"zevanje in podobno. Te stvari se nahajajo v datoteki \textit{data.py}, skripta z katero sem pa dodal nove attribute v binarnih vrednostih je pa \textit{newAttrs.py}.
+
 
 \newpage
 
@@ -91,13 +96,13 @@ ime datoteke & F-ocena & moja ocena & opis uporabljene metode \\
 \hline 
 *skupni.csv  & 0.42993 &  & 4 razli"cne rezultate (2 or RF, in 2 od KNN) sem enostavno zdru"zil skupaj, tako da sm upo"steval razrede, ki se v teh modelih pojavijo vsaj 2krat. \footnotetext{*Oddaje do 12. 3. 2012} \\ 
 \hline 
-rf\_top\_proc\_02\_30.csv & 0.43764 &  & navadni random forest iz Orange z 100 drevesi, in izbiranje atributov v odvisnosti od najboljsega v vrstici. Verjetnost izbire atributa linearno pada do 30. \\
+rf\_top\_proc\_02\_30.csv & 0.43764 &  & navadni random forest iz Orange z 100 drevesi, in izbiranje atributov v odvisnosti od najbolj"sega v vrstici. Verjetnost izbire atributa linearno pada do 30. \\
 \hline 
 rf\_1332091593\_02\_30.csv & 0.44242 &  &  enako kot prej"snji le da sem pri gradnji drevesa dodal "se vse atribute binarizirane.\\
 \hline 
 knn\_rf\_1332111511.csv & 0.45409 &  & tukaj sem normaliziral in ute"zeno se"stel verjetnosti razredov, ki sem jih dobil od RF (0.65) in KNN (0.35). Rezultate sem z svojim izbiranjem dobil z parametri 0.22 in 30.\footnote{prvo "stevilo je pove koliko se mora verjetnost drugega razreda ujemati z najbolj"sim, da ga "se dodamo v izbor. Drugo "tevilo pa pove kako hitro se prvo "stevilo priblizuje 1. maximalno "stevilo dodanih razredov je torej 30*(1-0.22) pod pogojem da imajo vsi enako verjetnost.}
 \end{tabular} 
-\end{minipage}{15cm}
+\end{minipage}
 
 
 
