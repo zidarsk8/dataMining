@@ -21,13 +21,14 @@ if False and os.path.isfile(arrFile) and os.path.isfile(tesFile) and os.path.isf
 	tes = pickle.load(open(tesFile))
 	lab = pickle.load(open(labFile))
 else:
+	print "reading csv files"
 	f = open("minidata/trainingData.csv")
 	arr = [[int(y) for y in x.strip().split("\t")] for x in f.readlines()]
-	f = open("minidata/trainingData.csv")
+	f = open("minidata/testData.csv")
 	tes = [[int(y) for y in x.strip().split("\t")] for x in f.readlines()]
 	
 	aa, tt, rind = zip(*arr), zip(*tes), []
-	[rind.append(j) for j,i in enumerate(aa) if i.count(0) > len(i)-20]
+	[rind.append(j) for j,i in enumerate(aa) if i.count(0) > len(i)-40]
 	[aa.pop(i) for i in sorted(rind,reverse=True)]
 	[tt.pop(i) for i in sorted(rind,reverse=True)]
 	arr, tes = zip(*aa), zip(*tt)
@@ -88,8 +89,6 @@ trainer.train()
 print "training done2"
 trainer.train()
 print "training done3"
-trainer.train()
-print "training done4"
 
 result = []
 def sk(x): return x[1]
@@ -97,7 +96,8 @@ for i,t in enumerate(tes):
 	print i
 	r = [(i,j) for i,j in enumerate(n.activate(t))]
 
-	result.append([i for i,j in sorted(r, key=sk, reverse=True)])
+	result.append([(i,j) for i,j in sorted(r, key=sk, reverse=True)])
+
 
 
 f = file("results/nn%d.csv" % time(),"w")
