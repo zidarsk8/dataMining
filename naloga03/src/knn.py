@@ -107,6 +107,8 @@ def getPredictionsRows(trainD,trainL,testD):
 			res[i] = 0
 		for i in range(100):
 			for j in trainL[dd[i][0]]:
+				#Integrate[(Cos[Pi*(x/y)] + 1)^2, x]
+				#Plot[(Cos[Pi*(x/15)] + 1)^2/4, {x, 0, 15}]
 				res[j] += (100.0-i)/100
 				#res[j] += (float(dd[i][1])/maxDist)/100.0
 		rs = sorted(res.iteritems(), key=sk, reverse=True)
@@ -141,45 +143,39 @@ def avgFscore(t,p):
 	return sum/l
 
 
-labels = data.getLabelsArray()[:1000]
-rawData = data.getDataArray()[:1000]
+labels = data.getLabelsArray()
+rawData = data.getDataArray()
 stPrimerov = len(labels)
 
 
 
-bad = data.getBadAttributes(rawData,10)
-rawData = data.filterArr(rawData,bad)
+#bad = data.getBadAttributes(rawData,10)
+#rawData = data.filterArr(rawData,bad)
 
 k = 10;
 print "starting %d fold cross validation" % k
 print "number of cases: %d" % len(rawData)
 print "number of attributes: %d" % len(rawData[0])
 
-tolerance = [0.6,0.5,0.4,0.3]
-meja = [50,40,30,20,10,5]
-allTests = {}
-for tol in tolerance:
-	for mej in meja:
-		aaa = 0
-		allPred = []
-		for i in xrange(k):
-			#sys.stdout.write("\r%2s/%2d done" % (i+1,k))
-			f = stPrimerov/k * i
-			t = stPrimerov/k * (i+1)
-			trainD = rawData[:f]+rawData[t:]
-			trainL = labels[:f]+labels[t:]
-			testD = rawData[f:t]
-			testL = labels[f:t]
-			
-			predictions = getKnnResults(trainD,trainL,testD,tol,mej)
-			allPred += predictions
-		
-			avgf = avgFscore(testL,predictions)
-			aaa += avgf
-			print "%2d fscore : %.6f" % (i, avgf)
-		
-		print "povpreceno (%f,%d) : %.6f" % (tol,mej,aaa/k)
-		allTests[mej+tol] = allPred
+aaa = 0
+allPred = []
+for i in xrange(k):
+	#sys.stdout.write("\r%2s/%2d done" % (i+1,k))
+	f = stPrimerov/k * i
+	t = stPrimerov/k * (i+1)
+	trainD = rawData[:f]+rawData[t:]
+	trainL = labels[:f]+labels[t:]
+	testD = rawData[f:t]
+	testL = labels[f:t]
+	
+	predictions = getKnnResults(trainD,trainL,testD,0.45,20)
+	allPred += predictions
+
+	avgf = avgFscore(testL,predictions)
+	aaa += avgf
+	print "%2d fscore : %.6f" % (i, avgf)
+
+print "povpreceno (%f,%d) : %.6f" % (tol,mej,aaa/k)
 
 #labels = data.getLabelsArray(True)
 #rawData = data.getDataArray(True)
