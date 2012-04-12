@@ -131,3 +131,30 @@ def resultToCsv(arr,fn=""):
 	f.flush()
 	f.close()
 	
+def normalize(l):
+	r = []
+	for i in l:
+		m = max([y for x,y in i])
+		r.append([(x,y/m) for x,y in i])
+	return r
+
+def putTogether(arr1,arr2,w1,w2):
+	result = []
+	def sk(x): return x[1]
+	for index in range(len(arr1)):
+		res = {}
+		for x,y in arr1[index]:
+			x= int(str(x).replace("c",""))
+			if not res.has_key(x):
+				res[x] = 0
+			res[x] += y*w1
+		for x,y in arr2[index]:
+			x= int(str(x).replace("c",""))
+			if not res.has_key(x):
+				res[x] = 0
+			res[x] += y*w2
+		
+		dd = sorted(res.iteritems(), key=sk, reverse=True)
+		result.append(dd)
+	return result
+

@@ -19,6 +19,7 @@
 \definecolor{light-gray}{gray}{0.95}
 \usepackage{listings} % za vključevanje kode
 \usepackage{hyperref}
+\usepackage{endnotes}
 \renewcommand{\baselinestretch}{1.2} % za boljšo berljivost večji razmak
 \renewcommand{\appendixpagename}{Priloge}
 
@@ -45,7 +46,19 @@ Cilj te doma"ce naloge je bil naresti algoritem, ki na podlagi u"cne mno"zice po
 
 \subsection{Ocenjevanje to"cnosti}
 
+\subsubsection*{$k$-kratno pre"cno preverjanje}
+Z metodo $k$-kratnega pre"cnega preverjanja u"cno mno"zico razdelimo na k enakih delov. Potem pa $k$-krat ponovimo u"cenje pri katerem sedaj testno mno"zico predstavlja en del razdeljene u"cne mno"zice, za u"cno mno"zico pa uzamemo preostale primere. Po $k$ ponovitvah imamo za vse ucne primere na voljo pravilne rezultate in na"se napovedi. Za ocenjevanje teh napovedi obstaja ve"c ocen, kot sta na primer AUC in F-ocena, slednjo pa smo tudi uporabili.
 
+
+\subsubsection*{F-ocena}
+To je eden od mo"znih na"cinov ocenjevanja napovedi. Sestavljena je iz ocen precision in recall, vendar odpravlja njune slabosti pri preve"c ali premalo napovedanih podatkih. Za kon'cno oceno napovedi smo vzeli povpre"cje F-ocen za vse primere.
+
+\[avgFscore_i\  =\ \frac{ \sum^{N}_{i=1} Fscore_i }{N} \]
+
+\[Fscore_i\  =\ 2\ \cdot \ \frac{precision_i\, \cdot \, recall_i }{precision_i\, + \, recall_i } \]
+
+\[precision_i \ =\ \frac{|\,TocniRazredi\, \bigcap\, NapovedaniRazredi\, |}{|\,NapovedaniRazredi\, |} \]
+\[recall_i \ =\ \frac{|\,TocniRazredi \bigcap NapovedaniRazredi\, |}{|\,TocniRazredi\, |} \]
 
 \subsection{Napovedni modeli}
 
@@ -54,127 +67,45 @@ Cilj te doma"ce naloge je bil naresti algoritem, ki na podlagi u"cne mno"zice po
 
 \item[Naklju"cni gozd] (random forest, v nadaljevanju RF) je algoritem ki iz u"cne mno"zice podatkov zgradi $n$ odlo"citvenih dreves in sestavi napoved iz posameznih napovedi teh dreves. Tukaj sem uporabil RF iz knji"znice Orange z privzetimi nastavitvami za 100 dreves. Da sem pa RF pomagal, sem med tribute v testni in u"cni mno"zici dodal se binarne vrednosti teh atributov.
 
-\item[Kombinacija: ] Posebaj pa sem probaval tudi razlicne metode kombiniranja rezultatov pridobljenih iz zgoraj navedenih metod. Tukaj sem probal dva pristopa, kombiniranje kon"cnih rezultatov in kombiniranje verjetnosti ki jih posamezna metoda vrne. 
+\item[Kombinacija: ] Posebaj pa sem probaval tudi razlicne metode kombiniranja rezultatov pridobljenih iz zgoraj navedenih metod. Tukaj sem probal dva pristopa. Prvi je bil kombiniranje kon"cnih rezultatov, drugi in bolj"si pristop pa je bil kombiniranje verjetnosti, ki jih posamezna metoda vrne, ter nato sestavljanje kon"cnih rezultatov. \\
 
 \end{description}
 
+\subsubsection*{Kalibracija in izbor podatkov}
+Glavni del, pa ni bil optimizacija ali kalibracija algoritmov, vendar izbiranje rezultatov za vsak algoritem. Temu sem tudi namenil najve"c "casa. Za kalibracijo "cim bolj"sega "stevila napovedanih razredov, sem prav tako uporabljla F-oceno z k-kratnim pre"cnim preverjanjem, vendar na mnogo manj"si mno"zici podatkov(1000 primerov in manjk kot 400 atributov). \\
 
+\subsubsection*{Koda modelov}
 
-
-
+Omeniti moram da sem zdru"zevanje rezultatov delal ro"cno v konzoli, vendar funkcija je vseeno zapisana v pomozni datoteki \textit{data.py} Napovedna modela se nahajata v datotekah z istim imenom (\textit{knn.py} za k najblji"zjih ter \textit{rf.py} za random forest). Zraven pa sem naredil "se nakaj skript ki so mi pomagale z delom z podatki, kot so branje, normalizacija tabel, zdru"zevanje in podobno. Te stvari se nahajajo v datoteki \textit{data.py}, skripta z katero sem pa dodal nove attribute v binarnih vrednostih je pa \textit{newAttrs.py}.
 
 
 \newpage
 
-
-
-
-
-
-Tu opišeš, na kakšen način si rešil nalogo (tehnike in metode, ki si
-jih uporabil). Lahko vključiš tudi zanimiv del programske kode, ki
-si jo morda pri tem razvil ali pa v poročilo dodatno vključiš sliko,
-kot je na primer slika~\ref{slika1}. Vse slike in tabele, ki jih
-vključiš v poročilo, morajo biti navedene v besedilu oziroma se moraš
-na njih sklicati.
-
-\begin{figure}[htbp]
-\begin{center}
-%\includegraphics[scale=0.3]{slika-primer.png}
-\caption{Vsako sliko opremi s podnapisom, ki pove, kaj slika prikazuje.}
-\label{slika1}
-\end{center}
-\end{figure}
-
-V to poglavje lahko tudi vključiš kakšen metodološko zanimiv del
-kode. Primer vključitve kode oziroma implementirane funkcije v
-programskem jeziku Python je:
-
-\begin{lstlisting}
-def fib(n):
-    if n == 0:
-        return 0
-    elif n == 1:
-        return 1
-    else:
-        return fib(n-1) + fib(n-2)
-\end{lstlisting}
-
-Izris te kode je lahko sicer tudi lepši, poskušaš lahko najti še
-primernejši način vključevanja kode v Pythonu oziroma v tvojem izbranem
-programskem jeziku v okolje \LaTeX{}.
-
 \section{Rezultati}
 
-V tem poglavju podaš rezultate s kratkim (enoodstavčnim)
-komentarjem. Rezultate lahko prikažeš tudi v tabeli (primer je
-tabela~\ref{tab1}).
+Na tekmovalnem stre"zniku sem pod imenom \textit{zidarsk8} odajal svoje napovedi. Napovedi za k najbli"zjih sosedov sem pred tem "se lokalno testiral z pre"cnim preverjanjem, vendar naklju"cnih gozdov pa se zaradi po"casnosti nisem odlo"cil testirati lokalno, zato tudi ne morem primerjati moje ocene in kon"cne ocene na stra"zniku.\\
 
-Odstavke pri pisanju poročila v LaTeX-u ločiš tako, da pred novim
-odstavkom pustiš prazno vrstico. Tudi, če pišeš poročilo v kakšnem
-drugem urejevalniku, morajo odstavki biti vidno ločeni. To narediš z
-zamikanjem ali pa z dodatnim presledkom.
+\begin{minipage}{14cm}
+\begin{tabular}{l|r|r|p{6cm}}
+ime datoteke & F-ocena & moja ocena & opis uporabljene metode \\ 
+\hline 
+\hline 
+*result1331479186.csv & 0.31053 & 0.40389 & samo kot zanimivost, dober rezultat z neveljavno datoteko\\ 
+\hline 
+*result1331479186.csv  & 0.41069 & 0.40389 & tokrat ista datoeka v pravilni obliki. Navadni knn, ki gleda le podobnosti in izbere najbolj pogoste razrede prvih 15 najblizjih primerov. \\ 
+\hline 
+*skupni.csv  & 0.42993 &  & 4 razli"cne rezultate (2 or RF, in 2 od KNN) sem enostavno zdru"zil skupaj, tako da sm upo"steval razrede, ki se v teh modelih pojavijo vsaj 2krat. \footnotetext{*Oddaje do 12. 3. 2012} \\ 
+\hline 
+rf\_top\_proc\_02\_30.csv & 0.43764 &  & navadni random forest iz Orange z 100 drevesi, in izbiranje atributov v odvisnosti od najbolj"sega v vrstici. Verjetnost izbire atributa linearno pada do 30. \\
+\hline 
+rf\_1332091593\_02\_30.csv & 0.44242 &  &  enako kot prej"snji le da sem pri gradnji drevesa dodal "se vse atribute binarizirane.\\
+\hline 
+knn\_rf\_1332111511.csv & 0.45409 &  & tukaj sem normaliziral in ute"zeno se"stel verjetnosti razredov, ki sem jih dobil od RF (0.65) in KNN (0.35). Rezultate sem z svojim izbiranjem dobil z parametri 0.22 in 30.\footnote{prvo "stevilo je pove koliko se mora verjetnost drugega razreda ujemati z najbolj"sim, da ga "se dodamo v izbor. Drugo "tevilo pa pove kako hitro se prvo "stevilo priblizuje 1. maximalno "stevilo dodanih razredov je torej 30*(1-0.22) pod pogojem da imajo vsi enako verjetnost.}
+\end{tabular} 
+\end{minipage}
 
-\begin{table}[htbp]
-\caption{Atributi in njihove zaloge vrednosti.}
-\label{tab1}
-\begin{center}
-\begin{tabular}{llp{3cm}}
-\hline
-ime spremenljivke & definicijsko območje & opis \\
-\hline
-cena & [0, 500] & cena izdelka v EUR\\
-teža & [1, 1000] & teža izdelka v dag \\
-kakovost & [slaba|srednja|dobra] & kakovost izdelka \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
 
-Podajanje rezultati naj bo primerno strukturirano. Če ima naloga več
-podnalog, uporabi podpoglavja. Če bi želel poročati o rezultatih
-izčrpno in pri tem uporabiti vrsto tabel ali grafov, razmisli o
-varianti, kjer v tem poglavju prikažeš in komentiraš samo glavne
-rezultate, kakšne manj zanimive detajle pa vključite v prilogo (glej
-prilogi~\ref{app-res} in~\ref{app-code}).
 
 \section{Izjava o izdelavi domače naloge}
-Domačo nalogo in pripadajoče programe sem izdelal sam.
-
-\appendix
-\appendixpage
-\section{\label{app-res}Podrobni rezultati poskusov}
-
-Če je rezultatov v smislu tabel ali pa grafov v nalogi mnogo,
-predstavi v osnovnem besedilu samo glavne, podroben prikaz
-rezultatov pa lahko predstaviš v prilogi. V glavnem besedilu ne
-pozabi navesti, da so podrobni rezultati podani v prilogi.
-
-\section{\label{app-code}Programska koda}
-
-Za domače naloge bo tipično potrebno kaj sprogramirati. Če ne bo od
-vas zahtevano, da kodo oddate posebej, to vključite v prilogo. Čisto
-za okus sem tu postavil nekaj kode, ki uporablja Orange
-(\url{http://www.biolab.si/orange}) in razvrščanje v skupine.
-
-
-\begin{lstlisting}
-import random
-import Orange
-
-data_names = ["iris", "housing", "vehicle"]
-data_sets = [Orange.data.Table(name) for name in data_names]
-
-print "%10s %3s %3s %3s" % ("", "Rnd", "Div", "HC")
-for data, name in zip(data_sets, data_names):
-    random.seed(42)
-    km_random = Orange.clustering.kmeans.Clustering(data, centroids = 3)
-    km_diversity = Orange.clustering.kmeans.Clustering(data, centroids = 3,
-        initialization=Orange.clustering.kmeans.init_diversity)
-    km_hc = Orange.clustering.kmeans.Clustering(data, centroids = 3,
-        initialization=Orange.clustering.kmeans.init_hclustering(n=100))
-    print "%10s %3d %3d %3d" % (name, km_random.iteration, \
-    km_diversity.iteration, km_hc.iteration)
-\end{lstlisting}
-
+Domačo nalogo in pripadajoče programe sem izdelal sam. 
 \end{document}

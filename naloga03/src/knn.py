@@ -1,4 +1,4 @@
-import cPickle as pickle
+#!/usr/bin/python2
 import data
 import sys
 from math import log
@@ -123,6 +123,12 @@ def getKnnResults(trainD,trainL,testD,a=0.2,b=30):
 		rr.append([x[0] for i,x in enumerate(r) if x[1] > r[0][1]*(a+(i/b))])
 	return rr
 
+def predToResults(pred,a,b):
+	rr = []
+	for r in pred:
+		rr.append([x[0] for i,x in enumerate(r) if x[1] > r[0][1]*(a+(i/b))])
+	return rr
+
 
 def precision(t,p):
 	return float(len(Set(t).intersection(Set(p)))) / len(p)
@@ -143,52 +149,58 @@ def avgFscore(t,p):
 	return sum/l
 
 
-labels = data.getLabelsArray(True)
-rawData = data.getDataArray(True)
+labels = data.getLabelsArray()
+rawData = data.getDataArray()
 stPrimerov = len(labels)
 
 
 
 #bad = data.getBadAttributes(rawData,10)
 #rawData = data.filterArr(rawData,bad)
-#
-#k = 10;
-#print "starting %d fold cross validation" % k
-#print "number of cases: %d" % len(rawData)
-#print "number of attributes: %d" % len(rawData[0])
-#
-#aaa = 0
-#allPred = []
-#for i in xrange(k):
-#	#sys.stdout.write("\r%2s/%2d done" % (i+1,k))
-#	f = stPrimerov/k * i
-#	t = stPrimerov/k * (i+1)
-#	trainD = rawData[:f]+rawData[t:]
-#	trainL = labels[:f]+labels[t:]
-#	testD = rawData[f:t]
-#	testL = labels[f:t]
-#	
-#	predictions = getKnnResults(trainD,trainL,testD,0.45,20)
-#	allPred += predictions
-#
-#	avgf = avgFscore(testL,predictions)
-#	aaa += avgf
-#	print "%2d fscore : %.6f" % (i, avgf)
-#
-#print "povpreceno (%f,%d) : %.6f" % (tol,mej,aaa/k)
 
-#labels = data.getLabelsArray(True)
-#rawData = data.getDataArray(True)
-#stPrimerov = len(labels)
-#
+k = 10;
+print "starting %d fold cross validation" % k
+print "number of cases: %d" % len(rawData)
+print "number of attributes: %d" % len(rawData[0])
+
+#tolerance = [a/100.0 for a in range(40,50) if a%2 == 0]
+#meja = [10,12,14,16,18,20]
+#allTests = {}
+#for tol in tolerance:
+#	for mej in meja:
+#		aaa = 0
+#		allPred = []
+#		for i in xrange(k):
+#			#sys.stdout.write("\r%2s/%2d done" % (i+1,k))
+#			f = stPrimerov/k * i
+#			t = stPrimerov/k * (i+1)
+#			trainD = rawData[:f]+rawData[t:]
+#			trainL = labels[:f]+labels[t:]
+#			testD = rawData[f:t]
+#			testL = labels[f:t]
+#			
+#			predictions = getKnnResults(trainD,trainL,testD,tol,mej)
+#			allPred += predictions
+#		
+#			avgf = avgFscore(testL,predictions)
+#			aaa += avgf
+#			print "%2d fscore : %.6f" % (i, avgf)
+#		
+#		print "povpreceno (%f,%d) : %.6f" % (tol,mej,aaa/k)
+#		allTests[mej+tol] = allPred
+
+labels = data.getLabelsArray(True)
+rawData = data.getDataArray(True)
+stPrimerov = len(labels)
+
 testData = data.getTestArray(True)
 predictions = getPredictionsRows(rawData,labels,testData)
 
-pickle.dump(predictions, open("knn_predictions_aa.pickled","w"))
 
-#f = file("result%d.csv" % time(),"w")
-#f.write("\n".join([",".join([str(x) for x in i]) for i in predictions ]))
-#f.flush()
-#f.close()
+cPickle.dump(predictions,open("minidata/knn-sotedRes-straight-dist-%d.pickled" % time(),"w"))
 
+f = file("result%d.csv" % time(),"w")
+f.write("\n".join([",".join([str(x) for x in i]) for i in predictions ]))
+f.flush()
+f.close()
 
