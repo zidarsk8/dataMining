@@ -45,45 +45,32 @@ def plotDataPointsMulti(aa,b):
 	ax.set_title('Using hypen instead of unicode minus')
 	plt.show()
 
-def plotDataPoints(a,b,lines):
-	matplotlib.rcParams['axes.unicode_minus'] = False
-	fig = plt.figure()
-	ax = fig.add_subplot(111)
-	ax.plot(a, b, 'o')
-	for l in lines:
-		ax.plot(l)
-	ax.set_title("prikaz tock z prilegajoco premico")
-	plt.show()
+def getContour(X,Y,f,t,points):
+	XX,YY = np.meshgrid(np.linspace(f,t,points),np.linspace(f,t,points))
+	Z = np.zeros(XX.shape)
+	for i in range(len(X)):
+		Z += (XX + YY * X[i] - Y[i]) ** 2
+	
+	return (XX,YY,Z**(0.5))
 
-def plotContour(pl1,pl2):
+def plotAllTheThings(pl1,pl2):
 	# Twice as wide as it is tall.
 	fig = plt.figure(figsize=plt.figaspect(0.5))
 
 	#---- First subplot
-	# for 3d ax = fig.add_subplot(1, 2, 1, projection='3d')
 	ax = fig.add_subplot(1, 2, 1)
-	X = np.arange(-5, 5, 0.25)
-	Y = np.arange(-5, 5, 0.25)
-	X, Y = np.meshgrid(X, Y)
-	R = np.sqrt(X**2 + Y**2)
-	Z = np.sin(R)
+	X,Y,Z = pl1
 
-	# for 3d
-	# surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.jet,
-	#		        linewidth=0, antialiased=False)
 	surf = ax.contour(X, Y, Z)
-
-	fig.colorbar(surf, shrink=0.5, aspect=10)
+	fig.colorbar(surf, shrink=0.9, aspect=10)
 
 	#---- Second subplot
 	a,b,lines = pl2
-
 	ax = fig.add_subplot(1,2,2)
 	ax.plot(a, b, 'o')
 	for l in lines:
 		ax.plot(l)
 	ax.set_title("prikaz tock z prilegajoco premico")
-
 
 	plt.show()
 
@@ -93,11 +80,15 @@ def plotContour(pl1,pl2):
 
 data,result =  parseFile(dataset)
 
-var = normalize(data[column])
+var = normalize(data[column])*2
 val = normalize(result)
 
 #plotDataPoints(normalize(data[0]),normalize(result),[[0,1],[0.5,0.1]])
-pl2 = (normalize(data[0]),normalize(result),[[0,1],[0.5,0.1]])
+pl2 = (var,val,[[0,1],[0.5,0.1]])
 
 
-plotContour(0,pl2)
+pl1 = getContour(var,val,-100,100,100)
+
+print pl1
+
+plotAllTheThings(pl1,pl2)
