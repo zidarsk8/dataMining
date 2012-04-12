@@ -4,6 +4,12 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.axes import Axes
+
+from matplotlib import cm
+from mpl_toolkits.mplot3d.axes3d import get_test_data
+from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 
 dataset = "data/x17.txt"
@@ -39,14 +45,47 @@ def plotDataPointsMulti(aa,b):
 	ax.set_title('Using hypen instead of unicode minus')
 	plt.show()
 
-def plotDataPoints(a,b):
+def plotDataPoints(a,b,lines):
 	matplotlib.rcParams['axes.unicode_minus'] = False
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
 	ax.plot(a, b, 'o')
-	ax.set_title('Using hypen instead of unicode minus')
+	for l in lines:
+		ax.plot(l)
+	ax.set_title("prikaz tock z prilegajoco premico")
 	plt.show()
 
+def plotContour(pl1,pl2):
+	# Twice as wide as it is tall.
+	fig = plt.figure(figsize=plt.figaspect(0.5))
+
+	#---- First subplot
+	# for 3d ax = fig.add_subplot(1, 2, 1, projection='3d')
+	ax = fig.add_subplot(1, 2, 1)
+	X = np.arange(-5, 5, 0.25)
+	Y = np.arange(-5, 5, 0.25)
+	X, Y = np.meshgrid(X, Y)
+	R = np.sqrt(X**2 + Y**2)
+	Z = np.sin(R)
+
+	# for 3d
+	# surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.jet,
+	#		        linewidth=0, antialiased=False)
+	surf = ax.contour(X, Y, Z)
+
+	fig.colorbar(surf, shrink=0.5, aspect=10)
+
+	#---- Second subplot
+	a,b,lines = pl2
+
+	ax = fig.add_subplot(1,2,2)
+	ax.plot(a, b, 'o')
+	for l in lines:
+		ax.plot(l)
+	ax.set_title("prikaz tock z prilegajoco premico")
+
+
+	plt.show()
 
 
 
@@ -57,8 +96,8 @@ data,result =  parseFile(dataset)
 var = normalize(data[column])
 val = normalize(result)
 
-print data
+#plotDataPoints(normalize(data[0]),normalize(result),[[0,1],[0.5,0.1]])
+pl2 = (normalize(data[0]),normalize(result),[[0,1],[0.5,0.1]])
 
-plotDataPointsMulti(normalizeColumns(data),normalize(result))
 
-
+plotContour(0,pl2)
