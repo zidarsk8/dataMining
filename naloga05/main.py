@@ -45,6 +45,18 @@ def plotDataPointsMulti(aa,b):
 	ax.set_title('Using hypen instead of unicode minus')
 	plt.show()
 
+# test za J
+# X = np.array([[1,2,3,4],[2,2,2,2]])
+# Y = np.array([5,6,7,8])
+# omega = np.array([0,1,2])
+# J(omega,X,Y) # more bit 0.0, ce je omega 1,1,2 more bit rezultat 2 ... itd
+def J(omega,X,Y):
+	# dodamo enke uspredi da normalno mnozimo z prvim theta
+	X = np.append(np.ones((1,X.shape[1])),X,axis=0)
+	h = X.T.dot(omega)
+	return ((h-Y)**2).sum()/2
+
+
 def getContour(X,Y,f,t,points):
 	XX,YY = np.meshgrid(np.linspace(f,t,points),np.linspace(f,t,points))
 	Z = np.zeros(XX.shape)
@@ -83,7 +95,6 @@ data,result =  parseFile(dataset)
 var = normalize(data[column])*2
 val = normalize(result)
 
-#plotDataPoints(normalize(data[0]),normalize(result),[[0,1],[0.5,0.1]])
 pl2 = (var,val,[[0,1],[0.5,0.1]])
 
 
