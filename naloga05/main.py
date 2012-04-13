@@ -12,9 +12,6 @@ from mpl_toolkits.mplot3d.axes3d import get_test_data
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 
-dataset = "data/x17.txt"
-
-column = 3
 
 # returns columns of data 
 def parseFile(filename,removeIndex = True):
@@ -62,22 +59,23 @@ def getContour(X,Y,f,t,points):
 	Z = np.zeros(XX.shape)
 	for i in range(len(X)):
 		Z += (XX + YY * X[i] - Y[i]) ** 2
-	
 	return (XX,YY,Z**(0.5))
 
-def plotAllTheThings(pl1,pl2):
+def plotAllTheThings(pl1,pl2,thete):
 	# Twice as wide as it is tall.
 	fig = plt.figure(figsize=plt.figaspect(0.5))
 
 	#---- First subplot
 	ax = fig.add_subplot(1, 2, 1)
 	X,Y,Z = pl1
+	for t in thete:
+		ax.plot(t[0],t[1],"x",color="blue")
 
 	surf = ax.contour(X, Y, Z)
 	fig.colorbar(surf, shrink=0.9, aspect=10)
 
 	#---- Second subplot
-	a,b,lines = pl2
+	a,b = pl2
 	ax = fig.add_subplot(1,2,2)
 	ax.plot(a, b, 'o')
 	for l in lines:
@@ -89,17 +87,19 @@ def plotAllTheThings(pl1,pl2):
 
 
 
+dataset = "data/x17.txt"
+column = 1
 
 data,result =  parseFile(dataset)
 
-var = normalize(data[column])*2
+var = normalize(data[column])*5
 val = normalize(result)
 
-pl2 = (var,val,[[0,1],[0.5,0.1]])
+pl2 = (var,val)
 
 
-pl1 = getContour(var,val,-100,100,100)
+pl1 = getContour(var,val,-10,10,100)
 
-print pl1
+thete=[[1,2],[2,3],[2.5,5],[3,10]]
 
-plotAllTheThings(pl1,pl2)
+plotAllTheThings(pl1,pl2,thete)
