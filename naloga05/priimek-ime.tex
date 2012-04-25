@@ -1,0 +1,128 @@
+% To je predloga za poročila o domačih nalogah pri predmetih, katerih
+% nosilec je Blaž Zupan. Seveda lahko tudi dodaš kakšen nov, zanimiv
+% in uporaben element, ki ga v tej predlogi (še) ni. Več o LaTeX-u izveš na
+% spletu, na primer na http://tobi.oetiker.ch/lshort/lshort.pdf.
+%
+% To predlogo lahko spremeniš v PDF dokument s pomočjo programa
+% pdflatex, ki je del standardne instalacije LaTeX programov.
+
+\documentclass[a4paper,11pt]{article}
+\usepackage{a4wide}
+\usepackage{fullpage}
+\usepackage[utf8x]{inputenc}
+\usepackage[slovene]{babel}
+\selectlanguage{slovene}
+\usepackage[toc,page]{appendix}
+\usepackage[pdftex]{graphicx} % za slike
+\usepackage{setspace}
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.95}
+\usepackage{listings} % za vključevanje kode
+\usepackage{hyperref}
+\renewcommand{\baselinestretch}{1.2} % za boljšo berljivost večji razmak
+\renewcommand{\appendixpagename}{Priloge}
+
+\lstset{ % nastavitve za izpis kode, sem lahko tudi kaj dodaš/spremeniš
+language=Python,
+basicstyle=\footnotesize,
+basicstyle=\ttfamily\footnotesize\setstretch{1},
+backgroundcolor=\color{light-gray},
+}
+
+\title{Linearna regresija}
+\author{Miha Zidar (63060317)}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Uvod}
+
+Namen te doma"ce naloge je, da se seznanimo z linearno regresijo, ter da med seboj primerjamo nekaj razli"cnih algoritmov za izra"cun linearne regresije.
+
+\section{Podatki}
+
+Podatke ki so primerni za linearno regresijo sem dobil na spletni strani \url{http://people.sc.fsu.edu/~jburkardt/datasets/regression/regression.html} kjer je na voljo ve"c podatkovnih baz. Izbral sem si bazo z imenom \textit{x17.txt}. V tej bazi imamo podatke o procesih v rafinariji, in iz njih i"s"cemo zakonitosti kako posamezna koli"cina dolo"cene snovi in optimalnost pogojev v rafinariji, vpliva na  to koliko oktansko govorivo bo pridelano. Prvi stolpec v bazi je zaporedno "stevilo primera, naslednji trije stolpci v bazi predstavljajo koli"cino posameznih materjalov, peti stolpec opisuje kako dobri so pogoji za rafinerijo, v zadnjem stolpcu pa je ocena koliko oktansko gorivo je bilo pridelano.
+
+Za "cim lep"si prikaz grafov, sem izbral tretji "cetrti atribut, ki opisuje pogoje v tovarni, nato pa sem podatke "se normaliziral in jih rahlo premaknil, le z namenom, da se razlike med posameznimi metodami "cim lep"se vidijo. V nadaljevanju bomo bomo uporabljali $m$ za "stevilo primerov, in $j$ za stevilo atributov, z navideznim atributom na za"cetku ki je vedno $1$.
+
+\section{Metode}
+
+Z linearno regresijo posku"samo najti tako linearno funkcijo z "cleni $\theta_0$ do $\theta_j$ da bo napaka pri regresijski napovedi "cim manj"sa. To napako izra"cunamo z fukncijo $J(\theta)$, 
+\[J(\theta) \ =\ \frac{1}{2} \sum_{i=1}^{m} (h_{\theta}(x^{(i)})-y^{(i)})^2 \]
+kjer z $\theta$ ozna"cujemo vektor $[\theta_0 \ \ldots \ \theta_j]$ in z $(i)$ posamezno vrstico oziroma posamezni primer 
+\subsection{Analiti"cna}
+Analiti"cno metodo za izra"cun linearne regresije sem implementiral kot navadno mno"zenje matrik, tako da sem dobil najboljso oceno za $\theta$:
+
+\[ \theta \ =\ (X^T \; X)^{-1}\; X^T \; \vec{y} \]
+
+kjer je $X$ matrika vseh vrstic z vsemi atributi.
+
+\subsection{Batch}
+Batch metoda je narejena tako da v vsakem koraku pogleda kolik"sna je napaka pri posameznem vektorju $\theta$ in potem z parcialnim odvodom funkcije napake, nastavi nov vektor $\theta$ tako da se napaka vsaki"c zmanj"sa. Konstantno izbolj"sevanje rezultata je razvidno na sliki \ref{batch}, kjer se lepo vidi da je vsaka naslednja to"cka bli"zje optimalni re"sitvi ki je na sredini narisanih elips. Velikost korakov ki zmanj"sujejo napako bomo ozna"cili z $\alpha$. 
+
+V vsakem koraku batch metode se naslednji pribli"zek izra"cuna z ena"cbo:
+
+\[  \theta_{j_{novi}} \ = \  \theta_{j_{stari}} + \alpha \; \sum_{i=1}^{m}(y^{(i)}-h_{\theta}(x^{(i)}))x_j^{(i)} \]
+
+in to ponovimo za vsakj $j$ tako da dobimo celotno novo oceno za $ \theta $.
+
+
+\subsection{Stohasti"cna}
+Problem pri batch metodi je ta, da za vsak korak pregledamo vse vrstice, kar pa je zamudno. Popravek temu je stohasti"cna metoda, ki $\theta$ popravi z vsakim primero. V zameno za te hitre popravke, dobimo dosti hitrejso konvergenco, vendar ta ni vedno zagotovljena. Popravki pri stohasti"cni metodi niso nujno vedno usmerjeni proti optimumu, kot je razvidno na sliki \ref{stoh} in zgledajo tako:
+
+\[  \theta_{j_{novi}} \ = \  \theta_{j_{stari}} + \alpha \; (y^{(i)}-h_{\theta}(x^{(i)}))x_j^{(i)} \]
+
+in to ponavljamo za vsak $j$ in za vse primere.
+
+
+\section{Rezultati}
+
+Za prikaz rezultatov, smo si iz podatko izbrali le en atribut, da lahko prikazemo regresijsko premico v 2d prostoru. Podatki so tudi normalizirani, in tako premaknjeni, da najlepse ponazarjajo razliko med razli"cnimi pristopi. Da je ta razlika, predvsem med stohasti"cno in batch metodo, "se bolj razvidna, sem izbral dovolj velik alfa, da se pri vsaki metodi vidi po kak"sni poti se pribli"zuje optimalni re"sitvi. Zaradi tega tudi rezultati ki so grafi"cno prikazani niso najbolj"se merilo katera metoda je bolj"sa. Za to primerjavo imamo spodaj tabelo \ref{tab1} kjer so rezultati posamezne metode na vseh podatkih.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.4]{stohasticna_l_01.pdf}
+\caption{Leva slika prikazuje kako se re"sitev neenakomerno pribli"zuje optimalni. Na desni strani pa vidimo najbolj"si pribli"zek batch metode obarvan z rde"co, zraven pa "se analiti"cno resitev, ki je obarvana zeleno. }
+\label{stoh}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.4]{batch_l_001.pdf}
+\caption{Na levi strani je prikazano lepo enakomerno pribli"zevanje optimalni vrednosti $\theta$. Na desni strani pa imamo z rdeco narisano to regresijsko premico, ki skor popolnoma prekriva zeleno premico, ki predstavlja analiti"cno re"sitev}
+\label{batch}
+\end{center}
+\end{figure}
+
+Pri nenormaliziranih podatkih sem opazil da je potrebo $\alpha$ dosti zmanj"sati, saj druga"ce stohasti"cna metoda ne konvergira. Tako pa da sem dobil primerljive podatke, sem vseeno vse stolplce normaliziral, za pogoj konvergence pa sem dolo"cil $\epsilon = 0.00005$, vendar z to razliko, da sem za batch metodo gledal razliko dveh napovedanih $\theta$ po vsakem celotnem prehodu podatkov, da bi bilo "stevilo prehodov "cim bolj podobno. V tabeli \ref{tab1} tudi vidimo da je pribli"zek  stohasti"cne metode pri enakem "stevilu korakov malo boljsi kot pri batch metodi. Zelo majhne razlike in podobne ocene pa gre pripisati normalizaciji podatkov.
+
+
+\begin{table}[htbp]
+\begin{center}
+\begin{tabular}{|l|l|r|}
+\hline
+metoda & J ocena & "stevilo korakov \\
+\hline
+analiti"cna & 0.11871566244 & \\
+\hline
+batch & 0.119289760464 & 7240\\
+\hline
+stohasti"cna &0.119253031665 &7240\\
+\hline
+\end{tabular}
+\caption{Primerjava metod na vseh podatkih.}
+\label{tab1}
+\end{center}
+\end{table}
+
+
+
+\section{Izjava o izdelavi domače naloge}
+Domačo nalogo in pripadajoče programe sem izdelal sam.
+
+
+\end{document}
