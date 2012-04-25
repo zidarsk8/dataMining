@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plot
+import cPickle
 import numpy as np
 import sys
 import Orange
@@ -43,6 +44,7 @@ X, y, _ = data.to_numpy()
 # m = rows, n = columns
 m,n = X.shape 
 folds = 10
+trees = 100
 
 
 cv_ind = [int(float(i)/m*folds) for i in range(m)]
@@ -56,7 +58,7 @@ for fold in range(folds):
     sys.stdout.flush()
     trainD = data.select(cv_ind,fold,negate=1)
     testD = data.select(cv_ind,fold)
-    rr = randomForest(trainD, testD, 10)
+    rr = randomForest(trainD, testD, trees)
     #rr = svm(trainD, testD)
     ind = [i for i,j in enumerate(cv_ind) if j == fold]
     for i,r in enumerate(rr):
@@ -66,7 +68,9 @@ yPred = [x if x>0 else 0.0001 for x in yPred]
 yPred = [x if x<1 else 0.9999 for x in yPred]
 #yPred = yPred*0.98+0.01
 
+
 _,yTrue,_ = data.to_numpy()
 print "rf done"
-
-print "logLoss rf: ", logLoss(yTrue, yPred);
+ll = logLoss(yTrue, yPred)
+print "logLoss rf: ", ll
+cPickle.dump(yPred,open("rf_%d_cv_%d_ll_%d.pkl" % (trees,folds,ll) ,"w"))
