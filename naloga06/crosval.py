@@ -64,9 +64,7 @@ for fold in range(folds):
     for i,r in enumerate(rr):
         yPred[ind[i]] = r
 
-yPred = [x if x>0 else 0.0001 for x in yPred]
-yPred = [x if x<1 else 0.9999 for x in yPred]
-#yPred = yPred*0.98+0.01
+yPred = np.array(yPred)*0.9998+0.0001
 
 
 _,yTrue,_ = data.to_numpy()
