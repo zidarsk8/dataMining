@@ -71,4 +71,4 @@ yPred = [x if x<1 else 0.9999 for x in yPred]
 _,yTrue,_ = data.to_numpy()
 ll = logLoss(yTrue, yPred)
 print method,"logLoss: ", ll
-cPickle.dump(yPred,open("%s_cv_%d_ll_%d.pkl" % (method,folds,ll) ,"w"))
+cPickle.dump(yPred,open("%s_cv_%d_ll1000_%d.pkl" % (method,folds,ll*1000) ,"w"))
