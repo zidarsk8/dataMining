@@ -3,11 +3,10 @@ import numpy as np
 import Orange
 
 
-data = Orange.data.Table("data/train.tab");
+data = Orange.data.Table("data/train.tab")
 
 
-
-X, y, _ = data.to_numpy();
+X, y, _ = data.to_numpy()
 
 print "stevilo primerov(m) %d\nstevilo atributov(n) %d" % X.shape
 
@@ -18,7 +17,7 @@ m,n = X.shape
 print "stevilo nul v celotni matriki %d/%d oziroma %.1f%%" %\
 		(sum(sum(X==0)),(n*m) , sum(sum(X==0))*100.0/(m*n))
 
-nenicelnih = sum(X != 0);
+nenicelnih = sum(X != 0)
 plot.hist(nenicelnih,bins=50)
 plot.xlabel("st. nenicelnih vrednosti")
 plot.ylabel("st. atributov")
