@@ -98,7 +98,7 @@ def binarizeX(x,y):
 		xbin = int("".join(["1" if i>s/n else "0" for i in x]),2)
 		xbin = {"c": countOnes(xbin), "n":xbin,"s":len(x)}
 		g = gain(xbin, y)
-		if g>=oldg:
+		if g>best:
 			spl = s/n
 			best = xbin
 		oldg = g
