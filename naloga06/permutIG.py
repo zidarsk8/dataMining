@@ -2,27 +2,11 @@ from bisect import bisect_left as bisect
 from random import shuffle
 from math import log
 import Orange
-
-
-# turns list of true and false strings into an int TTFT = 1101 = 13 
-def listToIntTF(l,t,f):
-	i = int("".join(l).replace(t,"1").replace(f,"0"),2)
-	return {"n":i, "l":len(l), "c":countOnes(i)}
-
-# turns a list of T and F to an integer representation
-def listToInt(l):
-	return listToIntTF(l,"T","F")
+import numpy as np
 
 # returns the number of bits set to 1 in a number
 def countOnes(n):
 	return bin(n).count("1")
-
-# calculates the entropy of a number, where the values of
-# each bit represents one value
-def entropy(n,size):
-	p1 = countOnes(n)/float(size)
-	p0 = 1-p1
-	return -(p1 * log(p1,2) + p0 * log (p0,2))
 
 # calculates information gain between two bitmaps (integers)
 # x,y must be {n: number, c: numberOfOnes, s: sizeRepresented}
@@ -88,40 +72,61 @@ def getGainValues(td, tl, orig, clas = 0, iterations = 100):
 	return res
 
 
+def binarizeXmean(x):
+	xbin = int("".join(["1" if i>x.mean() else "0" for i in x]),2)
+	return {"c": countOnes(xbin), "n":xbin,"s":len(x)}
 
 def binarizeX(x,y):
-	spl = 0.0
 	oldg = 0
 	best = {}
-	n = 500.0
-	for s in range(int(n)+1):
-		xbin = int("".join(["1" if i>s/n else "0" for i in x]),2)
+	un = np.unique(x)
+	if len(un) > 50:
+		return binarizeXmean(x)
+	meje = (un[1:]+un[:-1])/2
+	for s in meje:
+		xbin = int("".join(["1" if i>s else "0" for i in x]),2)
 		xbin = {"c": countOnes(xbin), "n":xbin,"s":len(x)}
 		g = gain(xbin, y)
-		if g>best:
-			spl = s/n
+		if g>oldg:
 			best = xbin
-		oldg = g
-		print "cur: %.5f      best: %5f     gain: %.5f"% (s/n,spl,g)
+			oldg = g
 	return best
 	#td = [int("".join(["1" if i>minval else "0" for i in x]),2) for x in X.T]
 	#td = [{"c": countOnes(i), "n":i,"s":m} for i in td]
 	
+def getGains(X,y,permutations = 1000, nonzero=50):
+	m = X.shape[0] 
+	yy = int("".join([str(int(a)) for a in y]),2);
+	tl = [{"c": countOnes(yy), "n":yy,"s":m}]
+	td = [binarizeX(x, tl[0]) for x in X.T]
+	orig = getOriginalGains(td,tl)
+	gains = getGainValues(td,tl, orig, clas = 0, iterations = 1000)
+	return (td,gains)
+
+
 
 if __name__ == "__main__":
 	
+	print "reading data"
 	data = Orange.data.Table("data/train.tab")
 	
 	X, y, _ = data.to_numpy()
 	# m = rows, n = columns
 	m,n = X.shape 
 	
-	
-	
 	yy = int("".join([str(int(a)) for a in y]),2);
 	tl = [{"c": countOnes(yy), "n":yy,"s":m}]
 	
-	td = binarizeX(X.T[180], tl[0])
+	print "binarize"
+	td = [binarizeX(x, tl[0]) for x in X.T]
+	#td = [binarizeXmean(x) for x in X.T]
+	#means = [x.mean() for x in X.T]
+	#td = [int("".join(["1" if i>means[i] else "0" for i in x]),2) for i,x in enumerate(X.T)]
+	#td = [{"c": countOnes(i), "n":i,"s":m} for i in td]
 	
-	#orig = getOriginalGains(td,tl)
-	#gains = getGainValues(td,tl, orig, clas = 0, iterations = 1000)
+	print "calculating original gains"
+	orig = getOriginalGains(td,tl)
+	print "calculating random gains"
+	gains = getGainValues(td,tl, orig, clas = 0, iterations = 1000)
+
+	print "done"
