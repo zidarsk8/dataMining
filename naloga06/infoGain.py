@@ -76,9 +76,9 @@ def binarizeXmean(x):
 	xbin = int("".join(["1" if i>x.mean() else "0" for i in x]),2)
 	return {"c": countOnes(xbin), "n":xbin,"s":len(x)}
 
-def binarizeX(x,y):
+def binarizeX(x,y,num = True):
 	oldg = 0
-	best = {}
+	best = 0
 	un = np.unique(x)
 	if len(un) > 50:
 		return binarizeXmean(x)
@@ -88,7 +88,10 @@ def binarizeX(x,y):
 		xbin = {"c": countOnes(xbin), "n":xbin,"s":len(x)}
 		g = gain(xbin, y)
 		if g>oldg:
-			best = xbin
+			if num:
+				best = xbin
+			else:
+				best = s
 			oldg = g
 	return best
 	#td = [int("".join(["1" if i>minval else "0" for i in x]),2) for x in X.T]
@@ -99,7 +102,8 @@ def getGains(X,y,permutations = 1000, nonzero=50):
 	yy = int("".join([str(int(a)) for a in y]),2);
 	tl = [{"c": countOnes(yy), "n":yy,"s":m}]
 	binVal = [binarizeX(x, tl[0]) for x in X.T]
-	td = np.array([["1" if j>binVal[i] else "0" for j in x] for i,x in enumerate(X.T)])
+	td = [int("".join(["1" if j>binVal[i] else "0" for j in x]),2) for i,x in enumerate(X.T)]
+	td = [{"c": countOnes(x), "n":x ,"s":m} for x in td]
 	orig = getOriginalGains(td,tl)
 	gains = getGainValues(td,tl, orig, clas = 0, iterations = 1000)
 	#td[:,[x[2] for x in gains if x[1]>nonzero]] 
@@ -144,7 +148,7 @@ if __name__ == "__main__":
 	tl = [{"c": countOnes(yy), "n":yy,"s":m}]
 	
 	print "binarize"
-	td = [binarizeX(x, tl[0]) for x in X.T]
+	td = [binarizeX(x, tl[0], num=True) for x in X.T]
 	#td = [binarizeXmean(x) for x in X.T]
 	#means = [x.mean() for x in X.T]
 	#td = [int("".join(["1" if i>means[i] else "0" for i in x]),2) for i,x in enumerate(X.T)]

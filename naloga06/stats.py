@@ -17,7 +17,7 @@ m,n = X.shape
 print "stevilo nul v celotni matriki %d/%d oziroma %.1f%%" %\
 		(sum(sum(X==0)),(n*m) , sum(sum(X==0))*100.0/(m*n))
 
-p = False
+p = True
 
 nenicelnih = sum(X != 0)
 if p:

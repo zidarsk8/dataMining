@@ -17,7 +17,7 @@ def randomForestBin(trainD,testD,trees=50,permutations=500,nonzero=50):
     X, y, _ = trainD.to_numpy()
     binVal,gains = infoGain.getGains(X, y, permutations, nonzero)
     
-    
+    print binVal
     
     rf = Orange.ensemble.forest.RandomForestLearner(trees=trees, name="forest")
     return getProb(rf, trainD, testD)
@@ -57,7 +57,7 @@ def logLoss(yTrue,yPred):
 
 
 
-if True:#__name__ == "__main__":
+if __name__ == "__main__":
     print "loading data"
     data = Orange.data.Table("data/train.tab")
     
@@ -66,28 +66,31 @@ if True:#__name__ == "__main__":
     m,n = X.shape 
     folds = 10
     trees = 4
-    method = "knn"
+    method = "rf_bin"
     
-    cv_ind = [int(float(i)/m*folds) for i in range(m)]
-    random.seed(12345)
-    random.shuffle(cv_ind)
-    
-    yPred = list(cv_ind)
-    #yPred = []
-    for fold in range(folds):
-        sys.stdout.write("\r%s crossvalidation: %d/%d" %(method,fold+1,folds))
-        sys.stdout.flush()
-        X = data.select(cv_ind,fold,negate=1)
-        testD = data.select(cv_ind,fold)
-        rr = randomForest(X, testD, trees)
-        #rr = svm(X, testD)
-        #rr = knn(X, testD)
-        ind = [i for i,j in enumerate(cv_ind) if j == fold]
-        for i,r in enumerate(rr):
-            yPred[ind[i]] = r
+    #cv_ind = [int(float(i)/m*folds) for i in range(m)]
+    #random.seed(12345)
+    #random.shuffle(cv_ind)
+    #
+    #yPred = list(cv_ind)
+    ##yPred = []
+    #for fold in range(folds):
+    #    sys.stdout.write("\r%s crossvalidation: %d/%d" %(method,fold+1,folds))
+    #    sys.stdout.flush()
+    #    X = data.select(cv_ind,fold,negate=1)
+    #    testD = data.select(cv_ind,fold)
+    #    if method ==  "rf_bin"  : rr = randomForestBin(X, testD, trees)
+    #    elif method == "rf"     : rr = randomForest(X, testD, trees)
+    #    elif method == "svm"    : rr = svm(X, testD, trees)
+    #    elif method == "knn"    : rr = knn(X, testD, trees)
+    #    
+    #    ind = [i for i,j in enumerate(cv_ind) if j == fold]
+    #    for i,r in enumerate(rr):
+    #        yPred[ind[i]] = r
 
-    yPred = np.array(yPred)*0.9998+0.0001
+    #yPred = np.array(yPred)*0.9998+0.0001
     
+    yPred = np.array([y.sum()/y.size]*m)
     print method,"logLoss: ", logLoss(y, yPred)
     
     #cPickle.dump(yPred,open("%s_cv_%d_ll1000_%d.pkl" % (method,folds,ll*1000) ,"w"))

@@ -1,0 +1,87 @@
+% To je predloga za poročila o domačih nalogah pri predmetih, katerih
+% nosilec je Blaž Zupan. Seveda lahko tudi dodaš kakšen nov, zanimiv
+% in uporaben element, ki ga v tej predlogi (še) ni. Več o LaTeX-u izveš na
+% spletu, na primer na http://tobi.oetiker.ch/lshort/lshort.pdf.
+%
+% To predlogo lahko spremeniš v PDF dokument s pomočjo programa
+% pdflatex, ki je del standardne instalacije LaTeX programov.
+
+\documentclass[a4paper,11pt]{article}
+\usepackage{a4wide}
+\usepackage{fullpage}
+\usepackage[utf8x]{inputenc}
+\usepackage[slovene]{babel}
+\selectlanguage{slovene}
+\usepackage[toc,page]{appendix}
+\usepackage[pdftex]{graphicx} % za slike
+\usepackage{setspace}
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.95}
+\usepackage{listings} % za vključevanje kode
+\usepackage{hyperref}
+\renewcommand{\baselinestretch}{1.2} % za boljšo berljivost večji razmak
+\renewcommand{\appendixpagename}{Priloge}
+
+\lstset{ % nastavitve za izpis kode, sem lahko tudi kaj dodaš/spremeniš
+language=Python,
+basicstyle=\footnotesize,
+basicstyle=\ttfamily\footnotesize\setstretch{1},
+backgroundcolor=\color{light-gray},
+}
+
+\title{Spoznavanje s podatki o biološkem odgovoru na učinkovine}
+\author{Miha Zidar (63060317)}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Uvod}
+
+V tej nalogi si bomo pogledali z kak"snimi podatki imamo opravka pri tekmovanju \url{http://www.kaggle.com/c/bioresponse/}. Preverili bomo kateri podatki so bolj pomembni in kateri manj. Na koncu bomo pa "se pogledali kak"sna funkcija se uporablja za ocenjevanje u"cinkovitosti napovedi in bomo nekaj preprostim metodam zmerili u"cinkovitost z k-kratnim pre"cnim preverjanjem.
+
+\section{Podatki in opis problema}
+
+Nasa naloga je "cim bolj u"cinkovito napovedovati ali bo dolo"cena molekula povzro"cila biolo"ski odziv ali ne. Podatke za to napoved imampo podane z 3751 primeri, vsak opisan z 1776 atributi. Razred, ki ga napovedujemo je binarni, in napovedati moramo verjetnost da posamezni primer pripada temu razredu. Med atributi imamo 835 binarnih in 1357 diskretnih "ce uzamem za mejo, da morajo imeti manj kot 10 razli"cnih vrednosti. Vse vrednosti so na zaprtem intervalu od 0 do 1. Tabela vsebuje 16\% neni"celnih elementov, ima pa tudi 28 atributov ki so brez neni"celnih elementov. 
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.45]{nenicelni.pdf}
+\caption{Prikaz koliko stolpcev ima kak"sno "stevilo elementov razlicnih od 0}
+\label{slika1}
+\end{center}
+\end{figure}
+
+
+\section{Informativnosti atributov}
+
+Ocenjevanje atributov sem se lotil na 3 razli"cne na"cine. Prvo sem poskusil relief oceno na vseh atributih, in vse sem upo"steval kot zvezne, nato sem odstranil iz mno"zice atributov vse ki imajo manj kot 20 razli"cnih vrednosti in to mno"zico spet ocenil z relief metodo. Na koncu sem pa "se naredil permutacijski test z info gain oceno, tako da sem vse atribute binariziral. Binarizacijo sem naredil tako da sm za vsak atribut dolo"cil mejo tako da sem maksimiziral Info gain oceno predno sem se lotil permutacijskega testa. 
+
+Z info gain oceno in permutacijskim testom dobimo da je z $ \alpha = 0.9$ pomembnih 1186 atributov, z $ \alpha = 0.99$ pa 782 atributov. Pri relief oceni pa sem za mejo ali je atribut dober ali ne vzel povpre"cno vrednost, in dobil da je le 608 atributov boljsih od povpre"cne vrednosti. Ocena relief metode za posamezni atribut se je dosti bolj ujemala z info gain permutacijskim testom, ko sem odstranil diskretne atribute, in posledi"cno s tem tudi zmanj"sal stevilo atributov, saj vemo da je lahko relief ob"cutljiv na preveliko "stevilo atributov v podatkih.
+ 
+ 
+ \section{Ocenjevanje kakovosti napovednih modelov}
+Modele ocenjujemo z funkcijo logLoss:
+\[ LogLoss=-\frac{1}{N}\sum_{i=1}^Ny_i\ln\left(\hat{y_i}\right)+\left(1-y_i\right)\ln\left(1-\hat{y_i}\right) \]
+
+kjer je $N$ število primerov, $\hat{y_i}$ na"sa napovedana verjetnost za i-ti primer in $y_i$  to"cna rezultat za i-ti primer.
+Z modeli \textit{naklju"cni gozd}, \textit{k-najbli"zjih sosedov} in \textit{fiksna verjetnost}, bomo posku"sali minimizirati oceno $LogLoss$.
+
+\section{Rezultati}
+
+Tukaj je nekaj napovednih modelov z dose"zeno $LogLoss$ oceno, ki so vzetit iz Orange z privzetimi nastavitvami. Ocenjeval sem z 10 kratnim pre"cnim preverjanjem, in preme"sanimi indeksi za vsako delitev.
+
+\begin{itemize}
+\item Random Forest (100 dreves) - tukaj sem dobil oceno $0.461$, kar je priblizno toliko kot random forest benchmark v tekmovanju.
+\item K-Nearest Neighbors - ta metoda se je obnesla slab"se kot Random Forest z oceno $0.538$
+\item Konstantna verjetnost - to pa je "se najslab"sa metoda, ki je za vse primere napovedala verjetnost  $0.542 = 2034/3751$, kar predstavlja kolik"sen del vseh razredov ima oceno 1. ta metoda je vrnila $LogLoss$ oceno $0.6895$.
+\end{itemize}
+
+
+
+\section{Izjava o izdelavi domače naloge}
+Domačo nalogo in pripadajoče programe sem izdelal sam.
+
+
+\end{document}
