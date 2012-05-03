@@ -14,7 +14,7 @@ import os
 def listToOrange(t,c):
 	labelSet = set(sum(c, []))
 
-	class_vars = [Orange.feature.Discrete("c%s" % i, values=["F","T"]) for i in labelSet]
+	class_vars = [Orange.feature.Discrete("c%s" % i, values=["0","1"]) for i in labelSet]
 	features = [Orange.feature.Continuous("%d" % i) for i in range(len(t[0]))]
 	domain = Orange.data.Domain(features, False, class_vars=class_vars)
 
