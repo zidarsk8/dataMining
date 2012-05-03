@@ -62,7 +62,7 @@ def getRandomGains(attribArr,clas,permutations):
 	return rg
 
 def getGainValues(td, tl, orig, clas = 0, iterations = 100):
-	#global orig, td, tl, X, y, m, n, maxLabel
+	#global orig, td, tl, trainD, y, m, n, maxLabel
 	res = []
 	rand = getRandomGains(td,tl[clas],iterations)
 	# uzame random info gaine, in shrani tuple, lokacija (1 je najbolsa 0 najslabsa), stevilo nenicelnih, in index.
@@ -91,7 +91,7 @@ def binarizeX(x,y):
 			best = xbin
 			oldg = g
 	return best
-	#td = [int("".join(["1" if i>minval else "0" for i in x]),2) for x in X.T]
+	#td = [int("".join(["1" if i>minval else "0" for i in x]),2) for x in trainD.T]
 	#td = [{"c": countOnes(i), "n":i,"s":m} for i in td]
 	
 def getGains(X,y,permutations = 1000, nonzero=50):
@@ -110,18 +110,18 @@ if __name__ == "__main__":
 	print "reading data"
 	data = Orange.data.Table("data/train.tab")
 	
-	X, y, _ = data.to_numpy()
+	trainD, y, _ = data.to_numpy()
 	# m = rows, n = columns
-	m,n = X.shape 
+	m,n = trainD.shape 
 	
 	yy = int("".join([str(int(a)) for a in y]),2);
 	tl = [{"c": countOnes(yy), "n":yy,"s":m}]
 	
 	print "binarize"
-	td = [binarizeX(x, tl[0]) for x in X.T]
-	#td = [binarizeXmean(x) for x in X.T]
-	#means = [x.mean() for x in X.T]
-	#td = [int("".join(["1" if i>means[i] else "0" for i in x]),2) for i,x in enumerate(X.T)]
+	td = [binarizeX(x, tl[0]) for x in trainD.T]
+	#td = [binarizeXmean(x) for x in trainD.T]
+	#means = [x.mean() for x in trainD.T]
+	#td = [int("".join(["1" if i>means[i] else "0" for i in x]),2) for i,x in enumerate(trainD.T)]
 	#td = [{"c": countOnes(i), "n":i,"s":m} for i in td]
 	
 	print "calculating original gains"
