@@ -139,15 +139,15 @@ def listToOrange(t,c):
 		data.append(d)
 	return data
 
-def listToOrangeSingleClass(t,c):
-	features = [Orange.feature.Continuous("%d" % i) for i in range(len(t[0]))]
+def listToOrangeSingleClass(X,y):
+	features = [Orange.feature.Continuous("%d" % i) for i in range(len(X[0]))]
 	class_var = Orange.feature.Discrete("class", values=["F","T"])
 	domain = Orange.data.Domain(features + [class_var])
 
 	data = Orange.data.Table(domain)
-	for i in range(len(t)):
-		d =	Orange.data.Instance(domain, list(t[i])+[["F", "T"][c[i]]])
-		#d.set_class(["F", "T"][c[i]])
+	for i in range(len(X)):
+		d =	Orange.data.Instance(domain, list(X[i])+[["F", "T"][y[i]]])
+		#d.set_class(["F", "T"][y[i]])
 		data.append(d)
 	return data
 

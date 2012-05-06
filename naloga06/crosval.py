@@ -13,23 +13,28 @@ def getProb(lrn,trainD,testD):
 def randomForest(trainD,testD,trees=50):
     rf = Orange.ensemble.forest.RandomForestLearner(trees=trees, name="forest")
     return getProb(rf, trainD, testD)
+    
 
 def randomForestBin(trainD,testD,trees=50,permutations=1000,nonzero=50,duplicateCount=0.2):
     
-    #### Majcn .. dej pomagi :) tnx :)
+
+    trainX, trainy, _ = trainD.to_numpy()
+    testX, testy, _ = testD.to_numpy()
     
-    X, y, _ = trainD.to_numpy()
-    Xx, yy, _ = testD.to_numpy()
-#    if int(duplicateCount) != duplicateCount:
-#        duplicateCount = int(X.shape[1]*duplicateCount);
-#    binVal,gains = infoGain.getGains(X, y, permutations, nonzero)
-#    ind = [x[2] for x in gains[0] if x[1] > nonzero][:duplicateCount]
-#    meje = [binVal[i] for i in ind]
-#    X = np.concatenate((X,(X.T[ind].T>meje).astype(float)),axis=1)
-#    Xx = np.concatenate((Xx,(Xx.T[ind].T>meje).astype(float)),axis=1)
-    
-    trainD = functions.listToOrangeSingleClass(X, y.astype(int))
-    testD = functions.listToOrangeSingleClass(Xx, yy.astype(int))
+    if int(duplicateCount) != duplicateCount:
+        duplicateCount = int(trainX.shape[1]*duplicateCount);
+    binVal,gains = infoGain.getGains(trainX, trainy, permutations, nonzero)
+    ind = [x[2] for x in gains[0] if x[1] > nonzero][:duplicateCount]
+    meje = [binVal[i] for i in ind]
+    trainX = np.concatenate((trainX,(trainX.T[ind].T>meje).astype(float)),axis=1)
+    testX = np.concatenate((testX,(testX.T[ind].T>meje).astype(float)),axis=1)
+
+    X = np.concatenate((trainX,testX),axis=0)
+    y = np.concatenate((trainy,testy),axis=0)
+    data = functions.listToOrangeSingleClass(X, y.astype(int))
+    ind = [0]*trainy.size + [1]*testy.size
+    trainD = data.select(ind,0)
+    testD = data.select(ind,1)
 
     rf = Orange.ensemble.forest.RandomForestLearner(trees=trees, name="forest")
     return getProb(rf, trainD, testD)
@@ -76,8 +81,8 @@ if __name__ == "__main__":
     X, y, _ = data.to_numpy()
     # m = rows, n = columns
     m,n = X.shape 
-    folds = 5
-    trees = 20
+    folds = 10
+    trees = 50
     method = "rf_bin"
     
     cv_ind = [int(float(i)/m*folds) for i in range(m)]
@@ -91,7 +96,8 @@ if __name__ == "__main__":
         sys.stdout.flush()
         trainD = data.select(cv_ind,fold,negate=1)
         testD = data.select(cv_ind,fold)
-        if method ==  "rf_bin"  : rr = randomForestBin(trainD, testD, trees, duplicateCount = 2)
+        
+        if method ==  "rf_bin"  : rr = randomForestBin(trainD, testD, trees, duplicateCount = 0.99)
         elif method == "rf"     : rr = randomForest(trainD, testD, trees)
         elif method == "svm"    : rr = svm(trainD, testD)
         elif method == "knn"    : rr = knn(trainD, testD)

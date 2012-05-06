@@ -1,13 +1,5 @@
 from collections import defaultdict
-from collections import Counter
-from itertools import chain
-from random import shuffle
-from math import ceil
-from time import time
-from sets import Set
-import cPickle
 import Orange
-import os
 
 
 
@@ -25,16 +17,12 @@ def listToOrange(t,c):
 		data.append(d)
 	return data
 
-def listToOrangeSingleClass(t,c):
-	features = [Orange.feature.Continuous("%d" % i) for i in range(len(t[0]))]
+def listToOrangeSingleClass(X,y):
+	features = [Orange.feature.Continuous("%d" % i) for i in range(len(X[0]))]
 	class_var = Orange.feature.Discrete("class", values=["0","1"])
 	domain = Orange.data.Domain(features + [class_var])
-
 	data = Orange.data.Table(domain)
-	for i in range(len(t)):
-		d =	Orange.data.Instance(domain, list(t[i])+[["0", "1"][c[i]]])
-		#d.set_class(["F", "T"][c[i]])
-		data.append(d)
+	[data.append(Orange.data.Instance(domain, list(X[i])+[["0", "1"][y[i]]])) for i in range(len(X))]
 	return data
 
 # arr has to be [[(clas, prob),...]] with sorted by probability in 
