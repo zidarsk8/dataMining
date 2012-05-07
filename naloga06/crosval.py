@@ -10,12 +10,23 @@ def getProb(lrn,trainD,testD):
     cl = lrn(trainD)
     return [cl(t, Orange.classification.Classifier.GetProbabilities)[True] for t in testD]
 
-def randomForest(trainD,testD,trees=50):
-    rf = Orange.ensemble.forest.RandomForestLearner(trees=trees, name="forest")
-    return getProb(rf, trainD, testD)
+def randomForest(trainD,testD,args={}):
+    min_instances = args["min_instances"] if type(args) == dict and args.has_key("min_instances") else 5
+    max_depth = args["max_depth"] if type(args) == dict and args.has_key("max_depth") else 100
+    trees = args["trees"] if type(args) == dict and args.has_key("trees") else 100
+    
+    st = Orange.classification.tree.SimpleTreeLearner(min_instances=min_instances, max_depth=max_depth)
+
+    rfs = Orange.ensemble.forest.RandomForestLearner(trees=trees, name="rfs", base_learner=st)
+    return getProb(rfs, trainD, testD)
     
 
-def randomForestBin(trainD,testD,trees=50,permutations=1000,nonzero=20,duplicateCount=500):
+def randomForestBin(trainD,testD,args):
+    trees = args["trees"] if type(args) == dict and args.has_key("trees") else 100
+    permutations = args["permutations"] if type(args) == dict and args.has_key("permutations") else 1000
+    nonzero = args["nonzero"] if type(args) == dict and args.has_key("nonzero") else 20
+    duplicateCount = args["duplicateCount"] if type(args) == dict and args.has_key("duplicateCount") else 500
+
     trainX, trainy, _ = trainD.to_numpy()
     testX, testy, _ = testD.to_numpy()
     
@@ -58,8 +69,7 @@ def logLoss(yTrue,yPred):
     return -1.0/N *( sum(np.log(yTPred)) + sum(np.log(1-yFPred)) )
 
 
-def crosval(data,method="rf",indexes=0,folds=10,trees=50,status=False):
-    _, y, _ = data.to_numpy()
+def crosval(data,method="rf",indexes=0,folds=10,status=False,args={}):
     m = len(data)
     folds = min(100,max(folds,2))
     if not isinstance(indexes,list) or len(indexes) != m:
@@ -74,19 +84,13 @@ def crosval(data,method="rf",indexes=0,folds=10,trees=50,status=False):
         trainD = data.select(indexes,fold,negate=1)
         testD = data.select(indexes,fold)
         
-        if method ==  "rf_bin"  : rr = randomForestBin(trainD, testD, trees)
-        elif method == "rf"     : rr = randomForest(trainD, testD, trees)
+        if method ==  "rf_bin"  : rr = randomForestBin(trainD, testD, args)
+        elif method == "rf"     : rr = randomForest(trainD, testD, args)
         elif method == "svm"    : rr = svm(trainD, testD)
         elif method == "knn"    : rr = knn(trainD, testD)
         
-        ind = [i for i,j in enumerate(indexes) if j == fold]
-        for i,r in enumerate(rr):
-            yPred[ind[i]] = r
-#        ind = [i for i,j in enumerate(indexes) if j == fold]
-#        [yPred.insert(ind[i], r) for i,r in enumerate(rr)]
+        yPred = [i if i!= fold else rr.pop(0)*0.9998+0.0001 for i in yPred]
         
-    yPred = np.array(yPred)*0.9998+0.0001
-    
     if status: print ""
     return yPred
 
@@ -95,41 +99,18 @@ if __name__ == "__main__":
     data = Orange.data.Table("data/train.tab")
     _,y,_ = data.to_numpy()
     
-    #random.seed(12345)
-
-    method = "rf_bin"
-    folds = 10
-    trees = 200
+    for i in range(10):
+        random.seed(12345) #for testing purpose only
+        
+        folds = 10
+        method = "rf"
+        args = {"trees" : 100,\
+                "max_depth": (i+1)*10}
+        
+        yPred = crosval(data, method=method, folds=folds, status=True,args=args);
+        ll = logLoss(y,yPred)
+        print i,"corssval:", ll
     
-    yPred = crosval(data, method=method, folds=folds, trees=trees, status=True);
-    ll = logLoss(y,yPred)
-    print "corssval:", ll
-    cPickle.dump(yPred,open("%s_cv_%d_ll1000_%d.pkl" % (method,folds,ll*1000) ,"w"))
     
-#    cv_ind = [int(float(i)/m*folds) for i in range(m)]
-#    random.seed(12345)
-#    random.shuffle(cv_ind)
-#    
-#    yPred = list(cv_ind)
-#    #yPred = []
-#    for fold in range(folds):
-#        sys.stdout.write("\r%s crossvalidation: %d/%d" %(method,fold+1,folds))
-#        sys.stdout.flush()
-#        trainD = data.select(cv_ind,fold,negate=1)
-#        testD = data.select(cv_ind,fold)
-#        
-#        if method ==  "rf_bin"  : rr = randomForestBin(trainD, testD, trees)
-#        elif method == "rf"     : rr = randomForest(trainD, testD, trees)
-#        elif method == "svm"    : rr = svm(trainD, testD)
-#        elif method == "knn"    : rr = knn(trainD, testD)
-#        
-#        ind = [i for i,j in enumerate(cv_ind) if j == fold]
-#        for i,r in enumerate(rr):
-#            yPred[ind[i]] = r
-#
-#    yPred = np.array(yPred)*0.9998+0.0001
-#    
-#    #yPred = np.array([y.sum()/y.size]*m)
-#    print ""
-#    print method,"logLoss: ", logLoss(y, yPred)
-#    
+    #cPickle.dump(yPred,open("%s_cv_%d_ll1000_%d.pkl" % (method,folds,ll*1000) ,"w"))
+    
