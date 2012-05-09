@@ -1,3 +1,4 @@
+from multiprocessing import Pool
 import cPickle
 import numpy as np
 import sys
@@ -69,48 +70,53 @@ def logLoss(yTrue,yPred):
     return -1.0/N *( sum(np.log(yTPred)) + sum(np.log(1-yFPred)) )
 
 
-def crosval(data,method="rf",indexes=0,folds=10,status=False,args={}):
+def crosval(data,method="rf",indexes=0,folds=10,status=False,threads=1,args={}):
+    #pripravimo indekse za krosvalidacijo in list za rezultate
     m = len(data)
     folds = min(100,max(folds,2))
     if not isinstance(indexes,list) or len(indexes) != m:
         indexes = [int(float(i)/m*folds) for i in range(m)]
         random.shuffle(indexes)
-    
     yPred = list(indexes)
-    for fold in range(folds):
-        if status:
-            sys.stdout.write("\r%s crossvalidation: %d/%d" %(method,fold+1,folds))
-            sys.stdout.flush()
+    
+    def cv(fold):
         trainD = data.select(indexes,fold,negate=1)
         testD = data.select(indexes,fold)
+        if method ==  "rf_bin"  : return randomForestBin(trainD, testD, args)
+        elif method == "rf"     : return randomForest(trainD, testD, args)
+        elif method == "svm"    : return svm(trainD, testD)
+        elif method == "knn"    : return knn(trainD, testD)
+    
+    #p = Pool(processes=2)
+    #rr = p.map(cv, range(folds))
+    #rr = [cv(fold) for fold in xrange(folds)]
+    rr = map(cv,range(folds))
+
+    for fold in range(folds):
+        yPred = [i if i!= fold else rr[fold].pop(0)*0.9998+0.0001 for i in yPred]
         
-        if method ==  "rf_bin"  : rr = randomForestBin(trainD, testD, args)
-        elif method == "rf"     : rr = randomForest(trainD, testD, args)
-        elif method == "svm"    : rr = svm(trainD, testD)
-        elif method == "knn"    : rr = knn(trainD, testD)
-        
-        yPred = [i if i!= fold else rr.pop(0)*0.9998+0.0001 for i in yPred]
-        
-    if status: print ""
+    #if status: print ""
     return yPred
 
+
 if __name__ == "__main__":
+    random.seed(123)
     print "loading data"
     data = Orange.data.Table("data/train.tab")
-    _,y,_ = data.to_numpy()
+    X,y,_ = data.to_numpy()
+    X = X[:700,:300]
+    y = y[:700]
     
-    for i in range(10):
-        random.seed(12345) #for testing purpose only
+    data = functions.listToOrangeSingleClass(X, y.astype(int))
+    
+    folds = 10
+    method = "knn"
+    args = {}
+    
+    print "starting crossval"
+    yPred = crosval(data, method=method, folds=folds, status=True,args=args);
+    ll = logLoss(y,yPred)
+    print "corssval:", ll
         
-        folds = 10
-        method = "rf"
-        args = {"trees" : 100,\
-                "max_depth": (i+1)*10}
-        
-        yPred = crosval(data, method=method, folds=folds, status=True,args=args);
-        ll = logLoss(y,yPred)
-        print i,"corssval:", ll
-    
-    
     #cPickle.dump(yPred,open("%s_cv_%d_ll1000_%d.pkl" % (method,folds,ll*1000) ,"w"))
     
