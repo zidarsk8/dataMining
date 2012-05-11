@@ -12,19 +12,28 @@ def getProb(lrn,trainD,testD):
     return [cl(t, Orange.classification.Classifier.GetProbabilities)[True] for t in testD]
 
 def randomForest(trainD,testD,args={}):
-    min_instances = args["min_instances"] if type(args) == dict and args.has_key("min_instances") else 5
-    max_depth = args["max_depth"] if type(args) == dict and args.has_key("max_depth") else 100
-    trees = args["trees"] if type(args) == dict and args.has_key("trees") else 100
-    st = Orange.classification.tree.SimpleTreeLearner(min_instances=min_instances, max_depth=max_depth)
-    rfs = Orange.ensemble.forest.RandomForestLearner(trees=trees, name="rfs", base_learner=st)
+    min_instances = args["min_instances"] if type(args) == dict and\
+            args.has_key("min_instances") else 5
+    max_depth = args["max_depth"] if type(args) == dict and\
+            args.has_key("max_depth") else 100
+    trees = args["trees"] if type(args) == dict and\
+            args.has_key("trees") else 100
+    st = Orange.classification.tree.SimpleTreeLearner(\
+            min_instances=min_instances, max_depth=max_depth)
+    rfs = Orange.ensemble.forest.RandomForestLearner(\
+            trees=trees, name="rfs", base_learner=st)
     return getProb(rfs, trainD, testD)
     
 
 def randomForestBin(trainD,testD,args):
-    trees = args["trees"] if type(args) == dict and args.has_key("trees") else 100
-    permutations = args["permutations"] if type(args) == dict and args.has_key("permutations") else 1000
-    nonzero = args["nonzero"] if type(args) == dict and args.has_key("nonzero") else 20
-    duplicateCount = args["duplicateCount"] if type(args) == dict and args.has_key("duplicateCount") else 500
+    trees = args["trees"] if type(args) == dict and\
+            args.has_key("trees") else 100
+    permutations = args["permutations"] if type(args) == dict and\
+            args.has_key("permutations") else 1000
+    nonzero = args["nonzero"] if type(args) == dict and\
+            args.has_key("nonzero") else 20
+    duplicateCount = args["duplicateCount"] if type(args) == dict and\
+            args.has_key("duplicateCount") else 500
 
     trainX, trainy, _ = trainD.to_numpy()
     testX, testy, _ = testD.to_numpy()
@@ -71,6 +80,7 @@ def cv(d):
     trainD = data.select(d["indexes"],d["fold"],negate=1)
     testD = data.select(d["indexes"],d["fold"])
     method = d["method"]
+    args = d["args"]
     if method ==  "rf_bin"  : return randomForestBin(trainD, testD, args)
     elif method == "rf"     : return randomForest(trainD, testD, args)
     elif method == "svm"    : return svm(trainD, testD)
@@ -83,7 +93,7 @@ def crosval(data,method="rf",indexes=0,folds=10,status=False,threads=1,args={}):
         indexes = [int(float(i)/m*folds) for i in range(m)]
         random.shuffle(indexes)
         
-    cvfolds = [{"data":data,"fold":x,"indexes":indexes,"method":method}\
+    cvfolds = [{"data":data,"fold":x,"indexes":indexes,"method":method,"args":args}\
                for x in range(folds)]
     
     if threads>1:
@@ -103,22 +113,24 @@ if __name__ == "__main__":
     random.seed(123)
     print "loading data"
     data = Orange.data.Table("data/train.tab")
-    X,y,_ = data.to_numpy()
-    a = range(X.shape[1])
+    _,y,_ = data.to_numpy()
+    a = range(y.size)
     random.shuffle(a)
-    X = X[:1000,a[:400]]
-    y = y[:1000]
-    data = functions.listToOrangeSingleClass(X, y.astype(int))
+    #X = X[:1000,a[:400]]
+    #y = y[:1000]
+    #data = functions.listToOrangeSingleClass(X, y.astype(int))
     #data = cPickle.load(file("data/minidata400x200.pkl"))
     #X,y,_ = data.to_numpy()
     
     folds = 10
     method = "rf"
 
-    args = {"trees":50}
-    yPred = crosval(data, method=method, folds=folds, status=True,args=args,threads=2);
+    args = {"trees":200}
+    yPred = crosval(data, method=method, folds=folds, status=True,\
+            args=args,threads=2);
     
     print "corssval:", logLoss(y,yPred),"                    "
         
-    #cPickle.dump(yPred,open("%s_cv_%d_ll1000_%d.pkl" % (method,folds,ll*1000) ,"w"))
+    #cPickle.dump(yPred,open("%s_cv_%d_ll1000_%d.pkl" %\
+    #        (method,folds,ll*1000) ,"w"))
     
