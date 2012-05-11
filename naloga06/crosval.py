@@ -79,12 +79,13 @@ def logLoss(yTrue,yPred):
 def cv(d):
     trainD = data.select(d["indexes"],d["fold"],negate=1)
     testD = data.select(d["indexes"],d["fold"])
-    method = d["method"]
-    args = d["args"]
-    if method ==  "rf_bin"  : return randomForestBin(trainD, testD, args)
-    elif method == "rf"     : return randomForest(trainD, testD, args)
-    elif method == "svm"    : return svm(trainD, testD)
-    elif method == "knn"    : return knn(trainD, testD)
+    if d["status"]: 
+        sys.stdout.write("\r%s crossvalidation fold: %d" %(method,d["fold"]+1))
+        sys.stdout.flush()
+    if d["method"] ==  "rf_bin"  : return randomForestBin(trainD, testD, d["args"])
+    elif d["method"] == "rf"     : return randomForest(trainD, testD, d["args"])
+    elif d["method"] == "svm"    : return svm(trainD, testD)
+    elif d["method"] == "knn"    : return knn(trainD, testD)
 
 def crosval(data,method="rf",indexes=0,folds=10,status=False,threads=1,args={}):
     m = len(data)
@@ -93,8 +94,8 @@ def crosval(data,method="rf",indexes=0,folds=10,status=False,threads=1,args={}):
         indexes = [int(float(i)/m*folds) for i in range(m)]
         random.shuffle(indexes)
         
-    cvfolds = [{"data":data,"fold":x,"indexes":indexes,"method":method,"args":args}\
-               for x in range(folds)]
+    cvfolds = [{"data":data,"fold":x,"indexes":indexes,"method":method,\
+                "args":args,"status":status} for x in range(folds)]
     
     if threads>1:
         p = Pool(processes=threads)
@@ -114,18 +115,18 @@ if __name__ == "__main__":
     print "loading data"
     data = Orange.data.Table("data/train.tab")
     _,y,_ = data.to_numpy()
-    a = range(y.size)
-    random.shuffle(a)
-    #X = X[:1000,a[:400]]
-    #y = y[:1000]
-    #data = functions.listToOrangeSingleClass(X, y.astype(int))
+#    a = range(X.shape[1])
+#    random.shuffle(a)
+#    X = X[:1000,a[:400]]
+#    y = y[:1000]
+#    data = functions.listToOrangeSingleClass(X, y.astype(int))
     #data = cPickle.load(file("data/minidata400x200.pkl"))
     #X,y,_ = data.to_numpy()
     
     folds = 10
     method = "rf"
 
-    args = {"trees":200}
+    args = {"trees":50,"max_depth":100}
     yPred = crosval(data, method=method, folds=folds, status=True,\
             args=args,threads=2);
     
