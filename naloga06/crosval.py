@@ -68,11 +68,11 @@ def logLoss(yTrue,yPred):
     return -1.0/N *( sum(np.log(yTPred)) + sum(np.log(1-yFPred)) )
 
 def cv(d):
-    trainD = data.select(d["indexes"],d["fold"],negate=1)
-    testD = data.select(d["indexes"],d["fold"])
+    trainD = d["data"].select_ref(d["indexes"],d["fold"],negate=1)
+    testD = d["data"].select_ref(d["indexes"],d["fold"])
     method = d["method"]
-    if method ==  "rf_bin"  : return randomForestBin(trainD, testD, args)
-    elif method == "rf"     : return randomForest(trainD, testD, args)
+    if method ==  "rf_bin"  : return randomForestBin(trainD, testD, d["args"])
+    elif method == "rf"     : return randomForest(trainD, testD, d["args"])
     elif method == "svm"    : return svm(trainD, testD)
     elif method == "knn"    : return knn(trainD, testD)
 
@@ -83,12 +83,14 @@ def crosval(data,method="rf",indexes=0,folds=10,status=False,threads=1,args={}):
         indexes = [int(float(i)/m*folds) for i in range(m)]
         random.shuffle(indexes)
         
-    cvfolds = [{"data":data,"fold":x,"indexes":indexes,"method":method}\
+    cvfolds = [{"data":data,"fold":x,"indexes":indexes,"method":method, "args":args, "status":status}\
                for x in range(folds)]
     
     if threads>1:
         p = Pool(processes=threads)
         rr = p.map(cv, cvfolds)
+        p.close()
+        p.join()
     else:
         rr = map(cv, cvfolds)
 
