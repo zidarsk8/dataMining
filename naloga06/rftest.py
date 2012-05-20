@@ -10,33 +10,35 @@ data = Orange.data.Table("data/train.tab")
 X,y,_ = data.to_numpy()
 
 
-random.seed(123)
-a = range(X.shape[1])
-random.shuffle(a)
-X = X[:400,a[:400]]
-y = y[:400]
-data = functions.listToOrangeSingleClass(X, y.astype(int))
-#data = cPickle.load(file("data/minidata400x200.pkl"))
-X,y,_ = data.to_numpy()
+#random.seed(123)
+#a = range(X.shape[1])
+#random.shuffle(a)
+#X = X[:300,a[:300]]
+#y = y[:300]
+#data = functions.listToOrangeSingleClass(X, y.astype(int))
+##data = cPickle.load(file("data/minidata400x200.pkl"))
+#X,y,_ = data.to_numpy()
 
 folds = 10
-method = "rf"
-
-ran = range(0,401,20)
+method = "rf_bin"
+f = 0
+t = X.shape[1]
+step = (t-f)/30 
+ran = range(f,t+1,step)
 ll = {i:[] for i in ran}
-for j in range(10):
+for j in range(20):
     print "----------------------",j,"------------------------"
     for i in ran:
-        args = {"permutations":400,
-                "duplicateCount":0,
-                "nonzero":5,
-                "trees":20}
-        yPred = crosval.crosval(data, method=method, folds=folds, status=False, args=args, threads=1);
+        args = {"permutations":500,
+                "duplicateCount":i,
+                "nonzero":10,
+                "trees":50}
+        yPred = crosval.crosval(data, method=method, folds=folds, status=False, args=args, threads=2);
         ll[i].append(crosval.logLoss(y,yPred))
         print i,"corssval:", ll[i][-1],"            "
         
 
-#pickle.dump(ll,open("ll_1700_1000_min_in_1_26_2.pkl","w"))
+pickle.dump(ll,open("cv_%s_%d_%d_folds_%d_duplicateCount_%d-%d-%d.pkl" % (method,X.shape[0],X.shape[1],folds,f,t,step),"w"))
 
 aa = np.array(sorted([(i, min(j),sum(j)/len(j),max(j)) for i,j in ll.items()]))
 
